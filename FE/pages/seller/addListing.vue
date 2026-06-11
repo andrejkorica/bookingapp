@@ -1,11 +1,11 @@
 <template>
-  <div class="bg-gray-900 text-white min-h-screen">
+  <div class="bg-white text-slate-900 min-h-screen">
     <UContainer class="py-12">
       <header class="mb-10">
-        <h1 class="text-4xl md:text-5xl font-bold tracking-tight text-white">
+        <h1 class="text-4xl md:text-5xl font-bold tracking-tight text-slate-900">
           Dodaj novi objekt
         </h1>
-        <p class="mt-2 text-lg text-gray-400">
+        <p class="mt-2 text-lg text-slate-500">
           Ispunite obrazac za dodavanje novog objekta u ponudu.
         </p>
       </header>
@@ -14,7 +14,7 @@
         <form @submit.prevent="handleSubmit" class="space-y-8">
           
           <div class="grid grid-cols-2 md:grid-cols-2 gap-8">
-            <UFormGroup label="Naslov objekta" class="w-full" :ui="{ label: { base: 'text-white font-bold' } }">
+            <UFormGroup label="Naslov objekta" class="w-full" :ui="{ label: { base: 'text-slate-700 font-bold' } }">
               <UInput 
                 v-model="listing.title"
                 placeholder="npr. Hotel Ambasador" 
@@ -25,7 +25,7 @@
               />
             </UFormGroup>
 
-            <UFormGroup label="Sadržaji" :ui="{ label: { base: 'text-white font-bold' } }">
+            <UFormGroup label="Sadržaji" :ui="{ label: { base: 'text-slate-700 font-bold' } }">
               <UInputMenu
                 v-model="listing.amenities"
                 :items="availableAmenities"
@@ -38,7 +38,7 @@
             </UFormGroup>
           </div>
 
-          <UFormGroup label="Opis objekta" :ui="{ label: { base: 'text-white font-bold' } }">
+          <UFormGroup label="Opis objekta" :ui="{ label: { base: 'text-slate-700 font-bold' } }">
             <UTextarea 
               v-model="listing.description"
               placeholder="Opišite objekt, njegove prednosti, sadržaje..." 
@@ -52,20 +52,20 @@
 
           <div class="space-y-8 pt-4">
             <div>
-              <label class="block text-sm font-bold text-white mb-2">Lokacija na mapi</label>
-              <div class="h-96 w-full bg-gray-800 border-2 border-dashed border-gray-600 rounded-lg flex items-center justify-center">
+              <label class="block text-sm font-bold text-slate-700 mb-2">Lokacija na mapi</label>
+              <div class="h-96 w-full bg-slate-100 border-2 border-dashed border-slate-300 rounded-xl flex items-center justify-center">
                 <div class="text-center">
-                  <UIcon name="i-heroicons-map" class="w-12 h-12 text-gray-500 mx-auto" />
-                  <p class="mt-2 text-gray-400">Map Placeholder (npr. Leaflet.js)</p>
+                  <UIcon name="i-heroicons-map" class="w-12 h-12 text-slate-400 mx-auto" />
+                  <p class="mt-2 text-slate-500">Map Placeholder (npr. Leaflet.js)</p>
                 </div>
               </div>
             </div>
 
-            <UCard class="bg-gray-800/75 border border-gray-700">
+            <UCard class="bg-white shadow-lg border border-slate-200">
                <div class="text-center space-y-4">
-                 <p class="text-lg text-gray-400">Cijena po noćenju</p>
+                 <p class="text-lg text-slate-500">Cijena po noćenju</p>
                  <div class="flex items-center justify-center">
-                   <span class="text-4xl font-bold text-gray-500 mr-2">€</span>
+                   <span class="text-4xl font-bold text-slate-400 mr-2">€</span>
                    <UInput 
                      v-model.number="listing.pricePerNight"
                      type="number"
@@ -84,7 +84,7 @@
               label="Spremi objekt" 
               size="xl" 
               block
-              class="bg-emerald-500 hover:bg-emerald-600 text-gray-900 font-bold"
+              class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold"
             />
           </div>
 

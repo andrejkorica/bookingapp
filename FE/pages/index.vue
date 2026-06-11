@@ -1,68 +1,74 @@
 <template>
-  <div
-    class="min-h-screen bg-gray-900 text-white"
-    style="background-image: radial-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px); background-size: 16px 16px;"
-  >
+  <div class="min-h-screen bg-slate-100 text-slate-900">
     <navbar/>
 
-    <main class="container mx-auto px- sm:px-6 lg:px-8">
-      <div class="max-w-4xl mx-auto text-center py-10 md:py-16">
-        <h1 class="text-4xl md:text-5xl font-bold text-white">
-          Find your next stay
-        </h1>
-        <p class="text-lg text-gray-400 mt-4">
-          Search deals on hotels, homes, and much more...
-        </p>
+    <!-- Hero banner with gradient -->
+    <div class="bg-gradient-to-br from-indigo-600 via-indigo-500 to-blue-500 pb-24 pt-12 md:pt-16">
+      <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="max-w-4xl mx-auto text-center">
+          <h1 class="text-4xl md:text-5xl font-extrabold text-white">
+            Find your next stay
+          </h1>
+          <p class="text-lg text-indigo-100 mt-4">
+            Search deals on hotels, homes, and much more...
+          </p>
+        </div>
+      </div>
+    </div>
 
-        <form @submit.prevent="handleSearch" class="mt-10">
-          <div
-            class="bg-gray-800/75 border border-gray-700 backdrop-blur-xl rounded-lg p-3"
-          >
-            <div class="grid grid-cols-1 md:grid-cols-10 gap-3 items-center">
-              <div class="md:col-span-3">
-                <UInput
-                  v-model="searchQuery.destination"
-                  icon="i-heroicons-map-pin"
-                  size="xl"
-                  placeholder="Where are you going?"
-                  :ui="{ leadingIcon:  'text-gray-400'  }"
-                />
-              </div>
+    <!-- Search bar overlapping the hero -->
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8 -mt-14">
+      <form @submit.prevent="handleSearch" class="max-w-5xl mx-auto">
+        <div
+          class="bg-white shadow-2xl rounded-2xl p-4 border border-slate-100"
+        >
+          <div class="grid grid-cols-1 md:grid-cols-10 gap-3 items-center">
+            <div class="md:col-span-3">
+              <UInput
+                v-model="searchQuery.destination"
+                icon="i-heroicons-map-pin"
+                size="xl"
+                placeholder="Where are you going?"
+                :ui="{ leadingIcon: 'text-indigo-400' }"
+              />
+            </div>
 
-              <div class="md:col-span-3">
-                <UInput
-                  v-model="searchQuery.dates"
-                  icon="i-heroicons-calendar-days"
-                  size="xl"
-                  placeholder="Check-in — Check-out"
-                  :ui="{ leadingIcon: 'text-gray-400' }"
-                />
-              </div>
-              
-              <div class="md:col-span-3">
-                <UInput
-                  v-model="searchQuery.occupancy"
-                  icon="i-heroicons-user-group"
-                  size="xl"
-                  placeholder="2 adults · 0 children"
-                  :ui="{ leadingIcon:  'text-gray-400'  }"
-                />
-              </div>
+            <div class="md:col-span-3">
+              <UInput
+                v-model="searchQuery.dates"
+                icon="i-heroicons-calendar-days"
+                size="xl"
+                placeholder="Check-in — Check-out"
+                :ui="{ leadingIcon: 'text-indigo-400' }"
+              />
+            </div>
+            
+            <div class="md:col-span-3">
+              <UInput
+                v-model="searchQuery.occupancy"
+                icon="i-heroicons-user-group"
+                size="xl"
+                placeholder="2 adults · 0 children"
+                :ui="{ leadingIcon: 'text-indigo-400' }"
+              />
+            </div>
 
-              <div class="md:col-span-1">
-                <UButton
-                  type="submit"
-                  label="Search"
-                  size="xl"
-                  block
-                  class="text-gray-900 font-bold"
-                />
-              </div>
+            <div class="md:col-span-1">
+              <UButton
+                type="submit"
+                label="Search"
+                size="xl"
+                block
+                class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold"
+              />
             </div>
           </div>
-        </form>
-      </div>
-      
+        </div>
+      </form>
+    </div>
+
+    <!-- Listings -->
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 pt-10">
       <section class="pb-12">
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
           <ListingCard 

@@ -1,9 +1,41 @@
 @import "tailwindcss";
 @import "@nuxt/ui";
 
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: #ffffff;
+  color: #0f172a;
+}
+
 button,
 input[type="button"],
 input[type="submit"],
 [role="button"] {
   cursor: pointer;
+}
+
+/* Override dark theme to match light design */
+.dark {
+  /* Background colors - light surfaces */
+  --ui-bg: #ffffff;
+  --ui-bg-muted: #f8fafc;
+  --ui-bg-elevated: #f1f5f9;
+  --ui-bg-accented: #e2e8f0;
+  --ui-bg-inverted: #0f172a;
+  
+  /* Text colors - dark text on light backgrounds */
+  --ui-text: #0f172a;
+  --ui-text-muted: #475569;
+  --ui-text-dimmed: #64748b;
+  --ui-text-highlighted: #000000;
+  
+  /* Border colors */
+  --ui-border: #e2e8f0;
+  --ui-border-muted: #f1f5f9;
+  
+  /* Primary color - emerald accent */
+  --ui-primary: #10b981;
+  --ui-primary-100: #d1fae5;
+  --ui-primary-500: #10b981;
+  --ui-primary-600: #059669;
 }

@@ -1,14 +1,15 @@
 <template>
   <div
-    class="min-h-screen flex items-center justify-center bg-gray-900 py-12"
-    style="background-image: radial-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px); background-size: 16px 16px;"
+    class="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 via-white to-slate-100 py-12"
   >
-    <UCard class="max-w-md w-full bg-gray-800/75 border border-gray-700 backdrop-blur-xl">
+    <UCard class="max-w-md w-full bg-white shadow-2xl border-0">
       <div class="space-y-6">
         <div class="text-center">
-          <div class="mx-auto h-16 w-16 bg-gray-700 rounded-lg mb-4" />
-          <h1 class="text-2xl font-bold text-white">Create an account</h1>
-          <p class="text-sm text-gray-400">Please enter your details to sign up.</p>
+          <div class="mx-auto h-16 w-16 bg-indigo-100 rounded-lg mb-4 flex items-center justify-center">
+            <UIcon name="i-lucide-user-plus" class="w-8 h-8 text-indigo-600" />
+          </div>
+          <h1 class="text-2xl font-bold text-slate-900">Create an account</h1>
+          <p class="text-sm text-slate-500">Please enter your details to sign up.</p>
         </div>
 
         <UForm :state="state" @submit="onSubmit" class="space-y-4">
@@ -56,13 +57,13 @@
             label="Sign Up"
             size="lg"
             block
-            class="mt-6 bg-emerald-500 hover:bg-emerald-600 text-gray-900 font-bold"
+            class="mt-6 bg-indigo-600 hover:bg-indigo-700 text-white font-bold"
           />
         </UForm>
 
-        <p class="text-sm text-center text-gray-400">
+        <p class="text-sm text-center text-slate-500">
           Already have an account?
-          <ULink to="/auth/signin" class="font-semibold text-emerald-500 hover:text-emerald-600">
+          <ULink to="/auth/signin" class="font-semibold text-indigo-600 hover:text-indigo-700">
             Sign In
           </ULink>
         </p>

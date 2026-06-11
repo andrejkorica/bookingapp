@@ -1,15 +1,15 @@
 <template>
-  <div class="bg-gray-900 text-white min-h-screen">
+  <div class="bg-white text-slate-900 min-h-screen">
     <UContainer class="py-12">
       <div v-if="listingData">
         <header class="mb-8">
-          <h1 class="text-4xl md:text-5xl font-bold tracking-tight text-white mb-2">
+          <h1 class="text-4xl md:text-5xl font-bold tracking-tight text-slate-900 mb-2">
             {{ listingData.title }}
           </h1>
-          <div class="flex items-center space-x-4 text-gray-300">
+          <div class="flex items-center space-x-4 text-slate-500">
             <div class="flex items-center">
               <UIcon v-for="i in 5" :key="i" name="i-heroicons-star-solid" 
-                     :class="i <= listingData.rating ? 'text-yellow-400' : 'text-gray-600'" 
+                     :class="i <= listingData.rating ? 'text-yellow-400' : 'text-slate-200'" 
                      class="w-5 h-5" />
             </div>
             <div class="flex items-center">
@@ -26,44 +26,44 @@
             :ui="{ item: 'basis-full' }"
             :prev="{color: 'primary'}"
             :next="{color: 'primary'}"
-            class="border-gray-700"
+            class="rounded-2xl overflow-hidden shadow-lg"
             arrows
             indicators
           >
-            <img :src="item" class="w-full h-96 object-cover rounded-lg" draggable="false">
+            <img :src="item" class="w-full h-96 object-cover" draggable="false">
           </UCarousel>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-12">
           <div class="lg:col-span-2">
-            <h2 class="text-2xl font-bold border-b border-gray-700 pb-2 mb-4">
+            <h2 class="text-2xl font-bold border-b border-slate-200 pb-2 mb-4">
               O objektu
             </h2>
-            <p class="text-gray-300 leading-relaxed mb-8">
+            <p class="text-slate-600 leading-relaxed mb-8">
               {{ listingData.description }}
             </p>
 
             <h3 class="text-xl font-bold mb-4">Sadržaji</h3>
             <ul class="grid grid-cols-2 gap-x-8 gap-y-2">
               <li v-for="amenity in listingData.amenities" :key="amenity" class="flex items-center">
-                <UIcon name="i-heroicons-check-circle" class="w-5 h-5 text-emerald-500 mr-3" />
-                <span class="text-gray-300">{{ amenity }}</span>
+                <UIcon name="i-heroicons-check-circle" class="w-5 h-5 text-indigo-500 mr-3" />
+                <span class="text-slate-600">{{ amenity }}</span>
               </li>
             </ul>
           </div>
 
           <div>
-            <UCard class="bg-gray-800/75 border border-gray-700">
+            <UCard class="bg-white shadow-lg border border-slate-200">
               <div class="text-center space-y-4">
-                <p class="text-lg text-gray-400">Cijena po noćenju</p>
-                <p class="text-4xl font-bold text-white">
+                <p class="text-lg text-slate-500">Cijena po noćenju</p>
+                <p class="text-4xl font-bold text-slate-900">
                   €{{ listingData.pricePerNight }}
                 </p>
                 <UButton 
                   label="Rezerviraj sada"
                   size="xl" 
                   block
-                  class="bg-emerald-500 hover:bg-emerald-600 text-gray-900 font-bold"
+                  class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold"
                 />
               </div>
             </UCard>
@@ -71,22 +71,22 @@
         </div>
         
         <div class="mt-16">
-          <h2 class="text-2xl font-bold border-b border-gray-700 pb-2 mb-6">
+          <h2 class="text-2xl font-bold border-b border-slate-200 pb-2 mb-6">
             Recenzije i komentari ({{ listingData.comments.length }})
           </h2>
           <div class="space-y-6">
             <div v-for="(comment, index) in listingData.comments" :key="index"
-                 class="p-4 border border-gray-800 rounded-lg bg-gray-800/50">
+                 class="p-5 border border-slate-200 rounded-xl bg-slate-50">
               <div class="flex items-center justify-between mb-2">
-                <p class="font-semibold text-white">{{ comment.author }}</p>
+                <p class="font-semibold text-slate-900">{{ comment.author }}</p>
                 <div class="flex items-center">
                   <UIcon v-for="i in 5" :key="i" name="i-heroicons-star-solid" 
-                         :class="i <= comment.rating ? 'text-yellow-400' : 'text-gray-600'" 
+                         :class="i <= comment.rating ? 'text-yellow-400' : 'text-slate-200'" 
                          class="w-4 h-4" />
                 </div>
               </div>
-              <p class="text-sm text-gray-400 mb-1">{{ comment.date }}</p>
-              <p class="text-gray-300">{{ comment.text }}</p>
+              <p class="text-sm text-slate-400 mb-1">{{ comment.date }}</p>
+              <p class="text-slate-600">{{ comment.text }}</p>
             </div>
           </div>
         </div>

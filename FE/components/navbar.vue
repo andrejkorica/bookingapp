@@ -1,12 +1,12 @@
 <template>
-  <header class="border-b border-gray-700">
+  <header class="border-b border-slate-200 bg-white">
     <nav
       class="container mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center h-16"
     >
       <div class="flex items-center space-x-6">
         <NuxtLink
           to="/"
-          class="text-2xl font-bold text-emerald-500 transition-all duration-300 hover:drop-shadow-[0_0_6px_#34d399]"
+          class="text-2xl font-bold text-indigo-600 transition-all duration-300 hover:text-indigo-700"
         >
           MyBooking
         </NuxtLink>
@@ -15,22 +15,22 @@
       <div v-if="!authStore.user" class="flex items-center space-x-3">
         <UButton
           label="Register"
-          variant="outline"
+          variant="soft"
+          color="neutral"
           size="sm"
-          class="text-white border-gray-600 hover:bg-gray-800"
           to="/auth/signup"
         />
         <UButton
           label="Sign in"
           variant="solid"
           size="sm"
-          class="text-gray-900 font-bold"
+          class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold"
           to="/auth/signin"
         />
       </div>
 
       <div v-else class="flex items-center space-x-4">
-        <span class="text-sm text-gray-300">
+        <span class="text-sm text-slate-600">
           Hi, {{ authStore.user.name }}
         </span>
 
@@ -43,7 +43,7 @@
             icon="i-lucide-user"
             variant="ghost"
             size="sm"
-            class="text-gray-300 hover:text-white hover:bg-gray-800"
+            class="text-slate-500 hover:text-slate-700 hover:bg-slate-100"
           />
         </UDropdownMenu>
       </div>
