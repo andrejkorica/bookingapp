@@ -34,8 +34,8 @@ input[type="submit"],
   --ui-border-muted: #f1f5f9;
   
   /* Primary color - emerald accent */
-  --ui-primary: #10b981;
-  --ui-primary-100: #d1fae5;
-  --ui-primary-500: #10b981;
-  --ui-primary-600: #059669;
+  --ui-primary: #6366f1;
+  --ui-primary-100: #e0e7ff;
+  --ui-primary-500: #6366f1;
+  --ui-primary-600: #4f46e5;
 }
