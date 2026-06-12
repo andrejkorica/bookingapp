@@ -3,6 +3,7 @@ package hr.pocetnik.bookingapp.service.implementation;
 import hr.pocetnik.bookingapp.exception.InvalidCredentialException;
 import hr.pocetnik.bookingapp.exception.InvalidEmailFormatException;
 import hr.pocetnik.bookingapp.exception.UserAlreadyExistsException;
+import hr.pocetnik.bookingapp.exception.UserNotFoundException;
 import hr.pocetnik.bookingapp.model.UserEntity;
 import hr.pocetnik.bookingapp.repository.UserRepository;
 import hr.pocetnik.bookingapp.service.UserService;
@@ -15,7 +16,6 @@ import java.util.regex.Pattern;
 @Service
 public class UserServiceImpl implements UserService {
 
-
     @Autowired
     private UserRepository userRepository;
 
@@ -26,7 +26,6 @@ public class UserServiceImpl implements UserService {
 
         String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
         String modifiedEmail = email.toLowerCase(Locale.ROOT);
-
 
         if (!EMAIL_PATTERN.matcher(modifiedEmail).matches()) {
             throw new InvalidEmailFormatException();
@@ -55,7 +54,8 @@ public class UserServiceImpl implements UserService {
         }
 
         UserEntity user = userRepository.findByEmail(modifiedEmail)
-                .orElseThrow(() -> new InvalidCredentialException());  // Može biti referenca na konstruktor, ali je nepotrebno. Ovako je čitljivije
+                .orElseThrow(() -> new InvalidCredentialException()); // Može biti referenca na konstruktor, ali je
+                                                                      // nepotrebno. Ovako je čitljivije
 
         if (!BCrypt.checkpw(password, user.getPassword())) {
             throw new InvalidCredentialException();
@@ -63,5 +63,24 @@ public class UserServiceImpl implements UserService {
 
         return user;
     }
-}
 
+    @Override
+    public UserEntity updateUser(String currentEmail, String name, String surname, String email) {
+        UserEntity user = userRepository.findByEmail(currentEmail)
+                .orElseThrow(() -> new UserNotFoundException(currentEmail));
+
+        if (name != null) {
+            user.setName(name);
+        }
+
+        if (surname != null) {
+            user.setSurname(surname);
+        }
+
+        if (email != null) {
+            user.setEmail(email);
+        }
+
+        return userRepository.save(user);
+    }
+}

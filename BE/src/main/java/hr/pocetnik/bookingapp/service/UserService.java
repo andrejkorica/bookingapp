@@ -7,4 +7,5 @@ public interface UserService {
 
     UserEntity  registerUser(String name, String surname, String email, String password);
     UserEntity loginUser(String email, String password);
+    UserEntity updateUser(String currentEmail, String name, String surname, String email);
 }
