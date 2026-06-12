@@ -48,6 +48,12 @@
         </UDropdownMenu>
       </div>
     </nav>
+
+    <!-- MODAL -->
+    <OptionsModal
+      v-model:open="optionsModalOpen"
+      v-model:tab="activeTab"
+    />
   </header>
 </template>
 
@@ -55,8 +61,22 @@
 import { ref } from 'vue'
 import { useAuthStore } from '~/stores/auth'
 import type { DropdownMenuItem } from '@nuxt/ui'
+import OptionsModal from '~/components/optionsModal.vue'
 
 const authStore = useAuthStore()
+
+/**
+ * IMPORTANT:
+ * Use STRING tabs (Nuxt UI v4 correct approach)
+ */
+const optionsModalOpen = ref(false)
+
+const activeTab = ref<'profile' | 'payments' | 'bookings'>('profile')
+
+const openModal = (tab: 'profile' | 'payments' | 'bookings') => {
+  activeTab.value = tab
+  optionsModalOpen.value = true
+}
 
 const dropdownItems = ref<DropdownMenuItem[][]>([
   [
@@ -70,17 +90,17 @@ const dropdownItems = ref<DropdownMenuItem[][]>([
     {
       label: 'Profile',
       icon: 'i-lucide-user',
-      to: '/profile'
+      onSelect: () => openModal('profile')
     },
     {
       label: 'Payment Methods',
       icon: 'i-lucide-credit-card',
-      to: '/payments'
+      onSelect: () => openModal('payments')
     },
     {
       label: 'Booking History',
       icon: 'i-lucide-calendar',
-      to: '/bookings'
+      onSelect: () => openModal('bookings')
     }
   ],
   [

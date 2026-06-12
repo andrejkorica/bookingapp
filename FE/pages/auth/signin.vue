@@ -12,7 +12,7 @@
             Welcome back
           </h1>
           <p class="text-sm text-slate-500">
-            Please enter your details to sign in.
+            Enter your details to sign in.
           </p>
         </div>
 
@@ -24,7 +24,7 @@
 
         <UForm :state="state" @submit="onSubmitLogin" class="space-y-4">
  
-            <UFormField  name="email">
+            <UFormField name="email">
               <template #label><span class="sr-only">Email</span></template>
               <UInput v-model="state.email" placeholder="Enter your email..." size="lg" class="w-full"/>
             </UFormField>
@@ -34,7 +34,7 @@
               <UInput
                 v-model="state.password"
                 type="password"
-                placeholder="••••••••••"
+                placeholder="Password"
                 size="lg"
                 class="w-full"
               />
@@ -52,14 +52,14 @@
         <p class="text-sm text-center text-slate-500 -mb-[2px]">
           Don't have an account yet?
           <ULink to="/auth/signup" class="font-semibold text-indigo-600 hover:text-indigo-700">
-            Sign Up
+            Sign up
           </ULink>
         </p>
 
         <p class="text-sm text-center text-slate-500">
-          Wanna go back?
+          Want to go back?
           <ULink to="/" class="font-semibold text-indigo-600 hover:text-indigo-700">
-            Home Page
+            Home page
           </ULink>
         </p>
 
