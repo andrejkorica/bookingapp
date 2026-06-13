@@ -71,9 +71,9 @@ const authStore = useAuthStore()
  */
 const optionsModalOpen = ref(false)
 
-const activeTab = ref<'profile' | 'payments' | 'bookings'>('profile')
+const activeTab = ref<'profile' | 'seller' | 'bookings'>('profile')
 
-const openModal = (tab: 'profile' | 'payments' | 'bookings') => {
+const openModal = (tab: 'profile' | 'seller' | 'bookings') => {
   activeTab.value = tab
   optionsModalOpen.value = true
 }
@@ -93,9 +93,9 @@ const dropdownItems = ref<DropdownMenuItem[][]>([
       onSelect: () => openModal('profile')
     },
     {
-      label: 'Payment Methods',
-      icon: 'i-lucide-credit-card',
-      onSelect: () => openModal('payments')
+      label: 'Seller info',
+      icon: 'i-lucide-badge-dollar-sign',
+      onSelect: () => openModal('seller')
     },
     {
       label: 'Booking History',

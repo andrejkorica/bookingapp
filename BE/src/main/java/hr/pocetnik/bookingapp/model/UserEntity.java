@@ -31,8 +31,13 @@ public class UserEntity {
     private String email;
     private String password;
 
+    @Column(name = "phone_number", nullable = false)
+    private String phoneNumber;
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)  // Definira odnos između entiteta. Doc: https://jakarta.ee/specifications/persistence/3.2/apidocs/jakarta.persistence/jakarta/persistence/onetomany
     private Set<BillingDataEntity> billingData;
+
+    
 
     @Transient
     public String getRoleType() {

@@ -4,7 +4,7 @@ import { defineStore } from 'pinia'
 
 export const useAuthStore = defineStore('auth', {
     state: () => ({
-        user: null as { email: string; name: string; surname: string, role: string } | null
+        user: null as { email: string; name: string; surname: string, role: string,  phoneNumber: string, } | null
     }),
     actions: {
         initAuth() {
@@ -21,7 +21,7 @@ export const useAuthStore = defineStore('auth', {
         async fetchUser() {
             const config = useRuntimeConfig()
             try {
-                const data = await $fetch<{ email: string; name: string; surname: string; role: string }>(
+                const data = await $fetch<{ email: string; name: string; surname: string; role: string, phoneNumber: string }>(
                       `${config.public.apiBase}/users/me`,
                     { credentials: 'include' }
                 )

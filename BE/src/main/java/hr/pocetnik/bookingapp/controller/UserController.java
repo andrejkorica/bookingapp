@@ -9,7 +9,6 @@ import hr.pocetnik.bookingapp.service.UserService;
 import io.jsonwebtoken.Claims;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -40,13 +39,15 @@ public class UserController {
                 String surname = userMap.get("surname");
                 String email = userMap.get("email");
                 String password = userMap.get("password");
+                String phoneNumber = userMap.get("phoneNumber");
 
                 Objects.requireNonNull(name, "First name must not be null");
                 Objects.requireNonNull(surname, "Surname must not be null");
                 Objects.requireNonNull(email, "Email must not be null");
                 Objects.requireNonNull(password, "Password must not be null");
+                Objects.requireNonNull(phoneNumber, "Phone number must not be null");
 
-                UserEntity user = userService.registerUser(name, surname, email, password);
+                UserEntity user = userService.registerUser(name, surname, email, password, phoneNumber);
                 String token = jwtService.generateToken(user);
 
                 ResponseCookie cookie = ResponseCookie.from("token", token)
@@ -59,7 +60,7 @@ public class UserController {
 
                 return ResponseEntity.ok()
                                 .header(HttpHeaders.SET_COOKIE, cookie.toString())
-                                .body(Map.of("message", "Login successful"));
+                                .body(Map.of("message", "Register successful"));
         }
 
         @PostMapping("/login")
@@ -116,12 +117,14 @@ public class UserController {
                                 currentEmail,
                                 userMap.get("name"),
                                 userMap.get("surname"),
-                                userMap.get("email"));
+                                userMap.get("email"),
+                                userMap.get("phoneNumber"));
 
                 return ResponseEntity.ok(Map.of(
                                 "email", updatedUser.getEmail(),
                                 "name", updatedUser.getName(),
                                 "surname", updatedUser.getSurname(),
+                                "phoneNumber", updatedUser.getPhoneNumber(),
                                 "role", claims.get("Role", String.class)));
         }
 
@@ -140,10 +143,12 @@ public class UserController {
                                 .orElseThrow(() -> new UserNotFoundException(email));
 
                 Map<String, String> userData = Map.of(
-                                "email", email,
+                                "email", user.getEmail(),
                                 "name", user.getName(),
                                 "surname", user.getSurname(),
+                                "phoneNumber", user.getPhoneNumber(),
                                 "role", role);
+
                 return ResponseEntity.ok(userData);
         }
 }

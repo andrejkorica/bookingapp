@@ -49,58 +49,85 @@ async function sendSellerRequest() {
 <template>
   <div class="space-y-6">
     <template v-if="isSeller">
-      <h2 class="text-xl font-semibold">
-        Seller Info
-      </h2>
+      <div class="text-center">
+        <h2 class="text-xl font-semibold">
+          Seller Info
+        </h2>
 
-      <p class="text-sm text-slate-600">
-        You are already registered as a seller.
-      </p>
+        <p class="mt-1 text-sm text-slate-600">
+          You are already registered as a seller.
+        </p>
+      </div>
     </template>
 
     <template v-else>
-      <h2 class="text-xl font-semibold">
-        Become a seller
-      </h2>
+      <div class="text-center">
+        <h2 class="text-xl font-semibold">
+          Become a Seller
+        </h2>
 
-      <p class="text-sm text-slate-600">
-        Fill in your billing information and send a request to become a seller.
-        An admin needs to approve your request first.
-      </p>
+        <p class="mx-auto mt-1 max-w-md text-sm text-slate-600">
+          Fill in your billing information and send a request to become a seller.
+          An admin needs to approve your request first.
+        </p>
+      </div>
 
-      <div class="max-w-md space-y-4">
-        <UInput
-          v-model="form.businessName"
-          placeholder="Business name"
-        />
+      <div class="mx-auto max-w-lg">
+        <UCard>
+          <template #header>
+            <h3 class="font-semibold">
+              Seller Request
+            </h3>
+          </template>
 
-        <UInput
-          v-model="form.oib"
-          placeholder="OIB"
-        />
+          <div class="space-y-4">
+            <UFormField label="Business Name">
+              <UInput
+                v-model="form.businessName"
+                placeholder="Enter your business name"
+              />
+            </UFormField>
 
-        <UInput
-          v-model="form.iban"
-          placeholder="IBAN"
-        />
+            <UFormField label="OIB">
+              <UInput
+                v-model="form.oib"
+                placeholder="Enter your OIB"
+              />
+            </UFormField>
 
-        <UInput
-          v-model="form.address"
-          placeholder="Billing address"
-        />
+            <UFormField label="IBAN">
+              <UInput
+                v-model="form.iban"
+                placeholder="Enter your IBAN"
+              />
+            </UFormField>
 
-        <UTextarea
-          v-model="form.requestText"
-          placeholder="Tell us why you want to become a seller"
-          :rows="4"
-        />
+            <UFormField label="Billing Address">
+              <UInput
+                v-model="form.address"
+                placeholder="Enter your billing address"
+              />
+            </UFormField>
 
-        <UButton
-          label="Send request"
-          :loading="isSending"
-          class="bg-indigo-600 text-white hover:bg-indigo-700"
-          @click="sendSellerRequest"
-        />
+            <UFormField label="Request Message">
+              <UTextarea
+                v-model="form.requestText"
+                placeholder="Tell us why you want to become a seller"
+                :rows="4"
+                class="w-full"
+              />
+            </UFormField>
+
+            <div class="pt-2">
+              <UButton
+                label="Send Request"
+                :loading="isSending"
+                class="bg-indigo-600 text-white hover:bg-indigo-700"
+                @click="sendSellerRequest"
+              />
+            </div>
+          </div>
+        </UCard>
       </div>
     </template>
   </div>
