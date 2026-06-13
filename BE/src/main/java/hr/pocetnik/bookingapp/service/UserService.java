@@ -1,5 +1,7 @@
 package hr.pocetnik.bookingapp.service;
 
+import java.util.List;
+
 import hr.pocetnik.bookingapp.model.UserEntity;
 
 public interface UserService {
@@ -24,4 +26,6 @@ public interface UserService {
             String email,
             String phoneNumber
     );
+    
+    List<UserEntity> getAllUsers();
 }

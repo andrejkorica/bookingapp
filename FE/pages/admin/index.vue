@@ -2,8 +2,10 @@
 import { useAuthStore } from '~/stores/auth'
 
 definePageMeta({
+  layout: 'admin',
   middleware: 'admin-guard'
 })
+
 
 const authStore = useAuthStore()
 </script>
@@ -36,7 +38,9 @@ const authStore = useAuthStore()
           <template #footer>
             <UButton
               label="View Requests"
-              class="bg-indigo-600 text-white hover:bg-indigo-700"
+              variant="soft"
+              color="neutral"
+              
             />
           </template>
         </UCard>
@@ -57,6 +61,7 @@ const authStore = useAuthStore()
               label="View Users"
               variant="soft"
               color="neutral"
+              to="/admin/users"
             />
           </template>
         </UCard>
