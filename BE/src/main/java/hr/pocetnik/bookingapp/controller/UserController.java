@@ -125,7 +125,7 @@ public class UserController {
                                 "name", updatedUser.getName(),
                                 "surname", updatedUser.getSurname(),
                                 "phoneNumber", updatedUser.getPhoneNumber(),
-                                "role", claims.get("Role", String.class)));
+                                "role",  updatedUser.getRole().name()));
         }
 
         @GetMapping("/me")
@@ -137,7 +137,6 @@ public class UserController {
 
                 Claims claims = jwtService.extractAllClaims(token);
                 String email = claims.getSubject();
-                String role = claims.get("Role", String.class);
 
                 UserEntity user = userRepository.findByEmail(email)
                                 .orElseThrow(() -> new UserNotFoundException(email));
@@ -147,7 +146,7 @@ public class UserController {
                                 "name", user.getName(),
                                 "surname", user.getSurname(),
                                 "phoneNumber", user.getPhoneNumber(),
-                                "role", role);
+                                "role", user.getRole().name());
 
                 return ResponseEntity.ok(userData);
         }
