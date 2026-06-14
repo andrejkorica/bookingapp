@@ -46,6 +46,7 @@ public class AuthFilter extends OncePerRequestFilter {
             FilterChain filterChain
     ) throws ServletException, IOException {
 
+
         String token = null;
 
         if (request.getCookies() != null) {
