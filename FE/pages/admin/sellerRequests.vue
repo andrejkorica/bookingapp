@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import sellerRequestCard from '~/components/admin/sellerRequestCard.vue'
+
 definePageMeta({
   layout: 'admin',
   middleware: 'admin-guard'
@@ -112,7 +114,7 @@ onMounted(fetchRequests)
 
 <template>
   <div class="container mx-auto px-4 py-10">
-    <div class="mb-8 flex items-center justify-between">
+    <div class="mb-8 flex items-center justify-between gap-4">
       <div>
         <h1 class="text-3xl font-bold text-slate-900">
           Seller Requests
@@ -141,79 +143,17 @@ onMounted(fetchRequests)
         No seller requests found.
       </div>
 
-      <div v-else class="divide-y divide-slate-200">
-        <div
+      <div
+        v-else
+        class="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3"
+      >
+        <sellerRequestCard
           v-for="request in requests"
           :key="request.id"
-          class="py-5"
-        >
-          <div class="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-            <div class="space-y-2">
-              <div>
-                <h2 class="font-semibold text-slate-900">
-                  {{ request.userName }} {{ request.userSurname }}
-                </h2>
-
-                <p class="text-sm text-slate-500">
-                  {{ request.userEmail }}
-                </p>
-              </div>
-
-              <div class="text-sm text-slate-600">
-                <p>
-                  <span class="font-medium">Business:</span>
-                  {{ request.businessName }}
-                </p>
-
-                <p>
-                  <span class="font-medium">OIB:</span>
-                  {{ request.oib }}
-                </p>
-
-                <p>
-                  <span class="font-medium">IBAN:</span>
-                  {{ request.iban }}
-                </p>
-
-                <p>
-                  <span class="font-medium">Billing Address:</span>
-                  {{ request.billingAddress }}
-                </p>
-              </div>
-
-              <p class="max-w-2xl text-sm text-slate-600">
-                <span class="font-medium">Message:</span>
-                {{ request.requestText }}
-              </p>
-
-              <UBadge
-                :label="request.status"
-                :color="request.status === 'APPROVED' ? 'success' : request.status === 'REJECTED' ? 'error' : 'warning'"
-                variant="soft"
-              />
-            </div>
-
-            <div class="flex gap-2">
-              <UButton
-                label="Approve"
-                icon="i-lucide-check"
-                color="success"
-                variant="soft"
-                :disabled="request.status !== 'PENDING'"
-                @click="approveRequest(request.id)"
-              />
-
-              <UButton
-                label="Reject"
-                icon="i-lucide-x"
-                color="error"
-                variant="soft"
-                :disabled="request.status !== 'PENDING'"
-                @click="rejectRequest(request.id)"
-              />
-            </div>
-          </div>
-        </div>
+          :request="request"
+          @approve="approveRequest"
+          @reject="rejectRequest"
+        />
       </div>
     </UCard>
   </div>

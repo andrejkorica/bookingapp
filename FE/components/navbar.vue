@@ -49,7 +49,6 @@
       </div>
     </nav>
 
-    <!-- MODAL -->
     <OptionsModal
       v-model:open="optionsModalOpen"
       v-model:tab="activeTab"
@@ -58,17 +57,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useAuthStore } from '~/stores/auth'
 import type { DropdownMenuItem } from '@nuxt/ui'
 import OptionsModal from '~/components/optionsModal.vue'
 
 const authStore = useAuthStore()
 
-/**
- * IMPORTANT:
- * Use STRING tabs (Nuxt UI v4 correct approach)
- */
 const optionsModalOpen = ref(false)
 
 const activeTab = ref<'profile' | 'seller' | 'bookings'>('profile')
@@ -78,7 +73,7 @@ const openModal = (tab: 'profile' | 'seller' | 'bookings') => {
   optionsModalOpen.value = true
 }
 
-const dropdownItems = ref<DropdownMenuItem[][]>([
+const dropdownItems = computed<DropdownMenuItem[][]>(() => [
   [
     {
       label: authStore.user?.name || 'User',
@@ -97,6 +92,25 @@ const dropdownItems = ref<DropdownMenuItem[][]>([
       icon: 'i-lucide-badge-dollar-sign',
       onSelect: () => openModal('seller')
     },
+
+    ...(authStore.user?.role === 'ADMIN'
+      ? [
+          {
+            label: 'Admin Dashboard',
+            icon: 'i-lucide-shield-check',
+            onSelect: () => navigateTo('/admin')
+          }
+        ]
+      : authStore.user?.role === 'SELLER'
+        ? [
+            {
+              label: 'Seller Dashboard',
+              icon: 'i-lucide-layout-dashboard',
+              onSelect: () => navigateTo('/seller')
+            }
+          ]
+        : []),
+
     {
       label: 'Booking History',
       icon: 'i-lucide-calendar',
