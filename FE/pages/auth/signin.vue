@@ -91,6 +91,11 @@ import type { FormSubmitEvent } from "#ui/types";
 import { useAuthStore } from "~/stores/auth";
 const config = useRuntimeConfig();
 
+definePageMeta({
+layout: false
+  
+})
+
 const schema = v.object({
   email: v.pipe(
     v.string(),

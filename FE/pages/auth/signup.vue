@@ -103,7 +103,7 @@ import type { FormSubmitEvent } from "#ui/types";
 import { useAuthStore } from "~/stores/auth";
 
 definePageMeta({
-  layout: "auth",
+  layout: false,
 });
 
 const config = useRuntimeConfig();
