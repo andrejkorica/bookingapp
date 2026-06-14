@@ -32,7 +32,7 @@ const authStore = useAuthStore()
           </template>
 
           <p class="text-sm text-slate-600">
-            Review users who requested to become sellers.
+            Review user submited seller requests.
           </p>
 
           <template #footer>
@@ -40,6 +40,7 @@ const authStore = useAuthStore()
               label="View Requests"
               variant="soft"
               color="neutral"
+              to="/admin/sellerRequests"
               
             />
           </template>

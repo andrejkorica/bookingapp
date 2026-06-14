@@ -1,7 +1,12 @@
 package hr.pocetnik.bookingapp.model;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+
 @Entity
+@Getter
+@Setter
 @Table(name = "seller_data")
 public class SellerDataEntity {
 
@@ -17,7 +22,7 @@ public class SellerDataEntity {
 
     private String billingAddress;
 
-    @OneToOne
-    @JoinColumn(name = "fk_user_id")
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "fk_user_id", referencedColumnName = "user_id", nullable = false)
     private UserEntity user;
 }

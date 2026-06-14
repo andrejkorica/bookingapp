@@ -1,7 +1,10 @@
 package hr.pocetnik.bookingapp.controller;
 
+import hr.pocetnik.bookingapp.model.SellerDataEntity;
+import hr.pocetnik.bookingapp.model.SellerRequestEntity;
 import hr.pocetnik.bookingapp.model.UserEntity;
 import hr.pocetnik.bookingapp.repository.UserRepository;
+import hr.pocetnik.bookingapp.service.SellerRequestService;
 import hr.pocetnik.bookingapp.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -16,11 +19,17 @@ public class AdminController {
 
     private final UserRepository userRepository;
     private final UserService userService;
+    private final SellerRequestService sellerRequestService;
 
     @Autowired
-    public AdminController(UserRepository userRepository, UserService userService) {
+    public AdminController(
+            UserRepository userRepository,
+            UserService userService,
+            SellerRequestService sellerRequestService
+    ) {
         this.userRepository = userRepository;
         this.userService = userService;
+        this.sellerRequestService = sellerRequestService;
     }
 
     @GetMapping("/users")
@@ -53,6 +62,28 @@ public class AdminController {
         userService.deleteUserByAdmin(userId);
     }
 
+    @GetMapping("/seller-requests")
+    public List<Map<String, String>> getSellerRequests() {
+        return sellerRequestService.getAllSellerRequests()
+                .stream()
+                .map(this::mapSellerRequest)
+                .toList();
+    }
+
+    @PostMapping("/seller-requests/{requestId}/approve")
+    public Map<String, String> approveSellerRequest(
+            @PathVariable("requestId") Long requestId
+    ) {
+        return mapSellerRequest(sellerRequestService.approveSellerRequest(requestId));
+    }
+
+    @PostMapping("/seller-requests/{requestId}/reject")
+    public Map<String, String> rejectSellerRequest(
+            @PathVariable("requestId") Long requestId
+    ) {
+        return mapSellerRequest(sellerRequestService.rejectSellerRequest(requestId));
+    }
+
     private Map<String, String> mapUser(UserEntity user) {
         return Map.of(
                 "id", user.getId().toString(),
@@ -63,4 +94,24 @@ public class AdminController {
                 "role", user.getRole().name()
         );
     }
+
+    private Map<String, String> mapSellerRequest(SellerRequestEntity request) {
+    SellerDataEntity sellerData = request.getUser().getSellerData();
+
+    return Map.ofEntries(
+            Map.entry("id", request.getId().toString()),
+            Map.entry("requestText", request.getRequestText()),
+            Map.entry("status", request.getStatus().name()),
+            Map.entry("createdAt", request.getCreatedAt().toString()),
+
+            Map.entry("userName", request.getUser().getName()),
+            Map.entry("userSurname", request.getUser().getSurname()),
+            Map.entry("userEmail", request.getUser().getEmail()),
+
+            Map.entry("businessName", sellerData.getBusinessName()),
+            Map.entry("oib", sellerData.getOib()),
+            Map.entry("iban", sellerData.getIban()),
+            Map.entry("billingAddress", sellerData.getBillingAddress())
+    );
+}
 }
