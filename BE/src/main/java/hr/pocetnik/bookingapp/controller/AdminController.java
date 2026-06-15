@@ -1,9 +1,12 @@
 package hr.pocetnik.bookingapp.controller;
 
 import hr.pocetnik.bookingapp.dto.listing.ListingResponse;
+import hr.pocetnik.bookingapp.model.ListingEntity;
+import hr.pocetnik.bookingapp.model.ListingStatus;
 import hr.pocetnik.bookingapp.model.SellerDataEntity;
 import hr.pocetnik.bookingapp.model.SellerRequestEntity;
 import hr.pocetnik.bookingapp.model.UserEntity;
+import hr.pocetnik.bookingapp.repository.ListingRepository;
 import hr.pocetnik.bookingapp.repository.UserRepository;
 import hr.pocetnik.bookingapp.service.ListingService;
 import hr.pocetnik.bookingapp.service.SellerRequestService;
@@ -23,6 +26,7 @@ public class AdminController {
     private final UserService userService;
     private final SellerRequestService sellerRequestService;
     private final ListingService listingService;
+
     @Autowired
     public AdminController(
             UserRepository userRepository,
@@ -86,6 +90,18 @@ public class AdminController {
     @GetMapping("/listings")
     public List<ListingResponse> getAllListings() {
         return listingService.getAllListings();
+    }
+
+    @PostMapping("/listings/{listingId}/approve")
+    public ListingResponse approveListing(
+            @PathVariable("listingId") Long listingId) {
+        return listingService.approveListing(listingId);
+    }
+
+    @PostMapping("/listings/{listingId}/reject")
+    public ListingResponse rejectListing(
+            @PathVariable("listingId") Long listingId) {
+        return listingService.rejectListing(listingId);
     }
 
     private Map<String, String> mapUser(UserEntity user) {

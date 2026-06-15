@@ -87,6 +87,26 @@ public class ListingServiceImpl implements ListingService {
                                 .toList();
         }
 
+        @Override
+        public ListingResponse approveListing(Long listingId) {
+                ListingEntity listing = listingRepository.findById(listingId)
+                                .orElseThrow(() -> new RuntimeException("Listing not found"));
+
+                listing.setStatus(ListingStatus.APPROVED);
+
+                return mapToResponse(listingRepository.save(listing));
+        }
+
+        @Override
+        public ListingResponse rejectListing(Long listingId) {
+                ListingEntity listing = listingRepository.findById(listingId)
+                                .orElseThrow(() -> new RuntimeException("Listing not found"));
+
+                listing.setStatus(ListingStatus.REJECTED);
+
+                return mapToResponse(listingRepository.save(listing));
+        }
+
         private ListingResponse mapToResponse(
                         ListingEntity listing) {
                 ListingResponse response = new ListingResponse();

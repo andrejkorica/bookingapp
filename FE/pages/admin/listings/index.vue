@@ -1,11 +1,10 @@
 <script setup lang="ts">
+import listingRequestCard from '~/components/admin/listingRequestCard.vue'
 
 definePageMeta({
   layout: 'admin',
   middleware: 'admin-guard'
 })
-
-import listingRequestCard from '~/components/admin/listingRequestCard.vue'
 
 type ListingRequest = {
   id: number
@@ -42,11 +41,71 @@ async function fetchListings() {
 
     toast.add({
       title: 'Error',
-      description: 'Failed to load listing requests.',
+      description: 'Failed to load listings.',
       color: 'error'
     })
   } finally {
     isLoading.value = false
+  }
+}
+
+async function approveListing(listingId: number) {
+  try {
+    const updatedListing = await $fetch<ListingRequest>(
+      `${config.public.apiBase}/admin/listings/${listingId}/approve`,
+      {
+        method: 'POST',
+        credentials: 'include'
+      }
+    )
+
+    listings.value = listings.value.map(listing =>
+      listing.id === updatedListing.id ? updatedListing : listing
+    )
+
+    toast.add({
+      title: 'Approved',
+      description: 'Listing approved successfully.',
+      color: 'success'
+    })
+  } catch (error) {
+    console.error(error)
+
+    toast.add({
+      title: 'Error',
+      description: 'Failed to approve listing.',
+      color: 'error'
+    })
+  }
+}
+
+async function rejectListing(listingId: number) {
+  try {
+    const updatedListing = await $fetch<ListingRequest>(
+      `${config.public.apiBase}/admin/listings/${listingId}/reject`,
+      {
+        method: 'POST',
+        credentials: 'include'
+      }
+    )
+
+    listings.value = listings.value.map(listing =>
+      listing.id === updatedListing.id ? updatedListing : listing
+    )
+
+    toast.add({
+      title: 'Rejected',
+      description: 'Listing rejected.',
+      color: 'success'
+    })
+  } catch (error) {
+    console.error(error)
+
+    toast.add({
+      title: 'Error',
+      description: 'Failed to reject listing.',
+      color: 'error'
+    })
   }
 }
 
@@ -92,6 +151,8 @@ onMounted(fetchListings)
           v-for="listing in listings"
           :key="listing.id"
           :listing="listing"
+          @approve="approveListing"
+          @reject="rejectListing"
         />
       </div>
     </UCard>
