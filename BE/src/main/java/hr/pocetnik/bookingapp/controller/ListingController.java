@@ -51,7 +51,7 @@ public class ListingController {
 
     @GetMapping("/listings/{id}")
     public ListingResponse getListingById(
-            @PathVariable Long id
+            @PathVariable("id") Long id
     ) {
         return listingService.getListingById(id);
     }

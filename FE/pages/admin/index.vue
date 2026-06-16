@@ -40,7 +40,7 @@ const authStore = useAuthStore()
               label="View Requests"
               variant="soft"
               color="neutral"
-              to="/admin/options/sellerRequests"
+              to="/admin/sellerRequests"
               
             />
           </template>
@@ -62,7 +62,7 @@ const authStore = useAuthStore()
               label="View Users"
               variant="soft"
               color="neutral"
-              to="/admin/options/users"
+              to="/admin/users"
             />
           </template>
         </UCard>
@@ -83,7 +83,7 @@ const authStore = useAuthStore()
               label="View Listings"
               variant="soft"
               color="neutral"
-              to="/admin/options/listings"
+              to="/admin/listings"
             />
           </template>
         </UCard>
