@@ -121,7 +121,7 @@ async function fetchListings() {
 
   try {
     listings.value = await $fetch<Listing[]>(
-      `${config.public.apiBase}/seller/listings`
+      `${config.public.apiBase}/listings`
     )
   } catch (error) {
     console.error(error)

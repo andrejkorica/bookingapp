@@ -33,19 +33,24 @@ public class AuthFilter extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String path = request.getServletPath();
+        String method = request.getMethod();
 
         return path.equals("/users/login")
                 || path.equals("/users/register")
-                || path.equals("/users/logout");
+                || path.equals("/users/logout")
+
+                || "OPTIONS".equalsIgnoreCase(method)
+
+                || ("GET".equalsIgnoreCase(method)
+                        && (path.equals("/listings")
+                                || path.startsWith("/listings/")));
     }
 
     @Override
     protected void doFilterInternal(
             HttpServletRequest request,
             HttpServletResponse response,
-            FilterChain filterChain
-    ) throws ServletException, IOException {
-
+            FilterChain filterChain) throws ServletException, IOException {
 
         String token = null;
 
@@ -72,13 +77,11 @@ public class AuthFilter extends OncePerRequestFilter {
         String email = claims.getSubject();
         String role = claims.get("Role", String.class);
 
-        UsernamePasswordAuthenticationToken authentication =
-                new UsernamePasswordAuthenticationToken(
-                        email,
-                        null,
-                        Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + role))
-                );
-        
+        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                email,
+                null,
+                Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + role)));
+
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         filterChain.doFilter(request, response);
