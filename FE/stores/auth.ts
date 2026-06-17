@@ -8,6 +8,7 @@ export const useAuthStore = defineStore('auth', {
       surname: string
       role: string
       phoneNumber: string
+      profileImageUrl?: string
     } | null
   }),
 
@@ -37,6 +38,7 @@ export const useAuthStore = defineStore('auth', {
           surname: string
           role: string
           phoneNumber: string
+          profileImageUrl?: string
         }>(
           `${config.public.apiBase}/users/me`,
           {

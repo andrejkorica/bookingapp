@@ -39,4 +39,6 @@ public class UserEntity {
             fetch = FetchType.LAZY
     )
     private SellerDataEntity sellerData;
+
+    private String profileImageUrl;
 }

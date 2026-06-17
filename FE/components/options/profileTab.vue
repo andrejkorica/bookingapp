@@ -1,98 +1,131 @@
 <script setup lang="ts">
-import { useAuthStore } from "~/stores/auth";
-import defaultAvatar from "../../assets/images/default-avatar.png";
+import { useAuthStore } from '~/stores/auth'
+import defaultAvatar from '../../assets/images/default-avatar.png'
 
-const config = useRuntimeConfig();
-const toast = useToast();
-const authStore = useAuthStore();
+const config = useRuntimeConfig()
+const toast = useToast()
+const authStore = useAuthStore()
 
-const isSavingProfile = ref(false);
+const isSavingProfile = ref(false)
+const isUploadingImage = ref(false)
 
 const form = reactive({
-  name: "",
-  surname: "",
-  phoneNumber: "",
-  email: "",
-});
+  name: '',
+  surname: '',
+  phoneNumber: '',
+  email: ''
+})
 
-const selectedImage = ref<string>(defaultAvatar);
-const selectedFile = ref<File | null>(null);
-const fileInput = ref<HTMLInputElement | null>(null);
+const selectedImage = ref<string>(defaultAvatar)
+const selectedFile = ref<File | null>(null)
+const fileInput = ref<HTMLInputElement | null>(null)
 
 function openFilePicker() {
-  fileInput.value?.click();
+  if (isUploadingImage.value) return
+  fileInput.value?.click()
 }
 
 function onFileSelected(event: Event) {
-  const target = event.target as HTMLInputElement;
-  const file = target.files?.[0];
+  const target = event.target as HTMLInputElement
+  const file = target.files?.[0]
 
-  if (!file) return;
+  if (!file) return
 
-  selectedFile.value = file;
-  selectedImage.value = URL.createObjectURL(file);
-
-  console.log("Selected file:", file);
+  selectedFile.value = file
+  selectedImage.value = URL.createObjectURL(file)
 }
 
 watch(
   () => authStore.user,
   (user) => {
-    if (!user) return;
+    if (!user) return
 
-    form.name = user.name;
-    form.surname = user.surname;
-    form.phoneNumber = user.phoneNumber;
-    form.email = user.email;
+    form.name = user.name
+    form.surname = user.surname
+    form.phoneNumber = user.phoneNumber
+    form.email = user.email
+
+    selectedImage.value = user.profileImageUrl || defaultAvatar
   },
-  { immediate: true },
-);
+  { immediate: true }
+)
 
-async function saveProfile() {
-  if (!authStore.user) return;
+async function uploadProfileImage() {
+  if (!selectedFile.value) return null
 
-  isSavingProfile.value = true;
+  isUploadingImage.value = true
 
   try {
+    const formData = new FormData()
+    formData.append('file', selectedFile.value)
+
+    const response = await $fetch<{ imageUrl: string }>(
+      `${config.public.apiBase}/users/profile-image`,
+      {
+        method: 'POST',
+        credentials: 'include',
+        body: formData
+      }
+    )
+
+    selectedFile.value = null
+    selectedImage.value = response.imageUrl
+
+    return response.imageUrl
+  } finally {
+    isUploadingImage.value = false
+  }
+}
+
+async function saveProfile() {
+  if (!authStore.user) return
+
+  isSavingProfile.value = true
+
+  try {
+    const uploadedImageUrl = await uploadProfileImage()
+
     const updatedUser = await $fetch<{
-      email: string;
-      name: string;
-      surname: string;
-      phoneNumber: string;
-      role: string;
+      email: string
+      name: string
+      surname: string
+      phoneNumber: string
+      role: string
+      profileImageUrl?: string
     }>(`${config.public.apiBase}/users/update`, {
-      method: "POST",
-      credentials: "include",
+      method: 'POST',
+      credentials: 'include',
       body: {
         name: form.name,
         surname: form.surname,
         phoneNumber: form.phoneNumber,
-        email: form.email,
-      },
-    });
+        email: form.email
+      }
+    })
 
     authStore.user = {
       ...authStore.user,
       ...updatedUser,
-    };
+      ...(uploadedImageUrl ? { profileImageUrl: uploadedImageUrl } : {})
+    }
 
-    localStorage.setItem("auth_user", JSON.stringify(authStore.user));
+    localStorage.setItem('auth_user', JSON.stringify(authStore.user))
 
     toast.add({
-      title: "Success",
-      description: "Profile updated successfully!",
-      color: "success",
-    });
+      title: 'Success',
+      description: 'Profile updated successfully!',
+      color: 'success'
+    })
   } catch (error) {
-    console.error("Failed to update profile:", error);
+    console.error('Failed to update profile:', error)
 
     toast.add({
-      title: "Error",
-      description: "Failed to update profile.",
-      color: "error",
-    });
+      title: 'Error',
+      description: 'Failed to update profile.',
+      color: 'error'
+    })
   } finally {
-    isSavingProfile.value = false;
+    isSavingProfile.value = false
   }
 }
 </script>
@@ -112,9 +145,21 @@ async function saveProfile() {
         <img
           :src="selectedImage"
           class="h-24 w-24 rounded-full border object-cover transition group-hover:brightness-75"
+          :class="{ 'brightness-75': isUploadingImage }"
         />
 
         <div
+          v-if="isUploadingImage"
+          class="absolute inset-0 flex items-center justify-center rounded-full bg-black/40"
+        >
+          <UIcon
+            name="i-lucide-loader-circle"
+            class="h-7 w-7 animate-spin text-white"
+          />
+        </div>
+
+        <div
+          v-else
           class="absolute inset-0 flex items-center justify-center rounded-full bg-black/40 opacity-0 transition group-hover:opacity-100"
         >
           <UIcon name="i-heroicons-camera" class="h-6 w-6 text-white" />
@@ -129,11 +174,10 @@ async function saveProfile() {
         @change="onFileSelected"
       />
 
-
       <div class="text-sm text-slate-600">
         <p>
           <span class="font-medium">Role:</span>
-          {{ authStore.user?.role || "USER" }}
+          {{ authStore.user?.role || 'USER' }}
         </p>
 
         <p>

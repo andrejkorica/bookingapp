@@ -4,6 +4,7 @@ import hr.pocetnik.bookingapp.exception.TokenNotFoundException;
 import hr.pocetnik.bookingapp.exception.UserNotFoundException;
 import hr.pocetnik.bookingapp.model.UserEntity;
 import hr.pocetnik.bookingapp.repository.UserRepository;
+import hr.pocetnik.bookingapp.service.ImageService;
 import hr.pocetnik.bookingapp.service.JwtService;
 import hr.pocetnik.bookingapp.service.UserService;
 import io.jsonwebtoken.Claims;
@@ -12,6 +13,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.Duration;
 import java.util.Map;
@@ -25,12 +27,14 @@ public class UserController {
         private final UserService userService;
         private final JwtService jwtService;
         private final UserRepository userRepository;
+        private final ImageService imageService;
 
         @Autowired
-        public UserController(UserService userService, JwtService jwtService, UserRepository userRepository) {
+        public UserController(UserService userService, JwtService jwtService, UserRepository userRepository, ImageService imageService) {
                 this.userService = userService;
                 this.jwtService = jwtService;
                 this.userRepository = userRepository;
+                this.imageService = imageService;
         }
 
         @PostMapping("/register")
@@ -125,7 +129,7 @@ public class UserController {
                                 "name", updatedUser.getName(),
                                 "surname", updatedUser.getSurname(),
                                 "phoneNumber", updatedUser.getPhoneNumber(),
-                                "role",  updatedUser.getRole().name()));
+                                "role", updatedUser.getRole().name()));
         }
 
         @GetMapping("/me")
@@ -149,5 +153,29 @@ public class UserController {
                                 "role", user.getRole().name());
 
                 return ResponseEntity.ok(userData);
+        }
+
+        @PostMapping("/profile-image")
+        public ResponseEntity<Map<String, String>> uploadProfileImage(
+                        @CookieValue(name = "token", required = false) String token,
+                        @RequestParam("file") MultipartFile file) {
+
+                if (token == null || token.isEmpty()) {
+                        throw new TokenNotFoundException();
+                }
+
+                Claims claims = jwtService.extractAllClaims(token);
+                String email = claims.getSubject();
+
+                UserEntity user = userRepository.findByEmail(email)
+                                .orElseThrow(() -> new UserNotFoundException(email));
+
+                String imageUrl = imageService.uploadImage(file);
+
+                user.setProfileImageUrl(imageUrl);
+                userRepository.save(user);
+
+                return ResponseEntity.ok(
+                                Map.of("imageUrl", imageUrl));
         }
 }
