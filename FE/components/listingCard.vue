@@ -6,7 +6,7 @@
     <div
       class="w-full h-[270px] bg-white rounded-2xl shadow-md overflow-hidden flex transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
     >
-      <div class="flex-1 p-6 flex flex-col justify-between">
+      <div class="w-1/2 min-w-0 p-6 flex flex-col justify-between">
         <div>
           <h2 class="text-xl font-bold leading-snug text-slate-800 transition">
             {{ listing.title }}
@@ -48,7 +48,7 @@
         </div>
       </div>
 
-      <div class="relative w-1/2 h-full hidden sm:block bg-slate-100">
+      <div class="relative w-1/2 shrink-0 h-full hidden sm:block bg-slate-100 overflow-hidden">
         <img
           v-if="listing.images?.length"
           :src="listing.images[currentImage]"
