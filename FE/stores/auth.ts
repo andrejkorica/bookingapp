@@ -13,7 +13,7 @@ export const useAuthStore = defineStore('auth', {
   }),
 
   actions: {
-    initAuth() {
+    async initAuth() {
       if (!import.meta.client) return
 
       const storedUser = localStorage.getItem('auth_user')
@@ -26,6 +26,8 @@ export const useAuthStore = defineStore('auth', {
           this.user = null
         }
       }
+
+      await this.fetchUser()
     },
 
     async fetchUser() {
@@ -53,6 +55,7 @@ export const useAuthStore = defineStore('auth', {
         }
       } catch (err) {
         this.user = null
+        localStorage.removeItem('auth_user')
 
         if (import.meta.client) {
           localStorage.removeItem('auth_user')
