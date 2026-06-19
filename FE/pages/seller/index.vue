@@ -63,7 +63,7 @@ const actionCardUi = {
         </UCard>
       </div>
 
-      <div class="grid items-stretch gap-6 md:grid-cols-3">
+      <div class="grid items-stretch gap-6 md:grid-cols-2">
         <UCard :ui="actionCardUi">
           <template #header>
             <h2 class="font-semibold">Create Listing</h2>
@@ -104,25 +104,7 @@ const actionCardUi = {
           </template>
         </UCard>
 
-        <UCard :ui="actionCardUi">
-          <template #header>
-            <h2 class="font-semibold">My Listing History</h2>
-          </template>
 
-          <p class="text-sm text-slate-600">
-            View listings you have already created and check their approval status.
-          </p>
-
-          <template #footer>
-            <UButton
-              label="View History"
-              icon="i-lucide-list"
-              variant="soft"
-              color="neutral"
-              to="/seller/listings"
-            />
-          </template>
-        </UCard>
       </div>
     </div>
   </div>

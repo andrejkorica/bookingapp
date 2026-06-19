@@ -123,6 +123,7 @@
                   block
                   class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold"
                   :disabled="!authStore.user || isOwner"
+                  :to="authStore.user && !isOwner ? `/bookings/create?listingId=${listingData.id}` : undefined"
                 />
 
                 <p v-if="!authStore.user" class="text-sm text-slate-500">

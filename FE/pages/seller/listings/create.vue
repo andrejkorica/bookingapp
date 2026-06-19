@@ -12,6 +12,7 @@ type ListingImage = {
 
 const config = useRuntimeConfig()
 const toast = useToast()
+const router = useRouter()
 
 const isSubmitting = ref(false)
 const fileInput = ref<HTMLInputElement | null>(null)
@@ -129,32 +130,48 @@ async function createListing() {
   <div class="min-h-screen bg-white text-slate-900">
     <UContainer class="py-12">
       <header class="mb-8">
-        <UInput
-          v-model="form.title"
-          placeholder="Property title"
-          size="xl"
-          class="mb-4"
-        />
+  <h1
+    class="mb-2 text-4xl font-bold tracking-tight text-slate-900 md:text-5xl"
+  >
+    Create Listing
+  </h1>
 
-        <div class="flex flex-col gap-4 md:flex-row md:items-center">
-          <UInput
-            v-model="form.location"
-            placeholder="Property location"
-            icon="i-heroicons-map-pin"
-            class="w-full md:max-w-xl"
-          />
+  <div class="mb-6 flex items-center justify-between gap-4">
+    <div class="flex min-w-0 flex-1 flex-col gap-4 md:flex-row md:items-center">
+      <UInput
+        v-model="form.location"
+        placeholder="Property location"
+        icon="i-heroicons-map-pin"
+        class="w-full md:max-w-xl"
+      />
 
-          <UInput
-            v-model.number="form.rating"
-            type="number"
-            min="1"
-            max="5"
-            placeholder="Rating"
-            icon="i-heroicons-star-solid"
-            class="w-full md:max-w-32"
-          />
-        </div>
-      </header>
+      <UInput
+        v-model.number="form.rating"
+        type="number"
+        min="1"
+        max="5"
+        placeholder="Rating"
+        icon="i-heroicons-star-solid"
+        class="w-full md:max-w-32"
+      />
+    </div>
+
+    <UButton
+      label="Back"
+      icon="i-lucide-arrow-left"
+      variant="soft"
+      color="neutral"
+      class="shrink-0"
+      @click="router.back()"
+    />
+  </div>
+
+  <UInput
+    v-model="form.title"
+    placeholder="Property title"
+    size="xl"
+  />
+</header>
 
       <div class="mb-12">
         <UCarousel
