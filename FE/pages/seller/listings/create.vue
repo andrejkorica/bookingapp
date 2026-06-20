@@ -37,7 +37,6 @@ const listingUnits = ref<ListingUnit[]>(
   unitTypes.map(unit => ({
     type: unit.value,
     label: unit.label,
-    enabled: false,
     quantity: 0,
     pricePerNight: 0
   }))
@@ -51,20 +50,29 @@ const previewImages = computed(() =>
 
 const selectedUnits = computed(() =>
   listingUnits.value.filter(unit =>
-    unit.enabled &&
-    unit.quantity > 0 &&
-    unit.pricePerNight > 0
+    Number(unit.quantity) > 0 &&
+    Number(unit.pricePerNight) > 0
   )
 )
 
 const lowestPrice = computed(() => {
-  if (!selectedUnits.value.length) return 0
-  return Math.min(...selectedUnits.value.map(unit => unit.pricePerNight))
+  if (!selectedUnits.value.length) {
+    return 0
+  }
+
+  return Math.min(
+    ...selectedUnits.value.map(unit => Number(unit.pricePerNight))
+  )
 })
 
 const highestPrice = computed(() => {
-  if (!selectedUnits.value.length) return 0
-  return Math.max(...selectedUnits.value.map(unit => unit.pricePerNight))
+  if (!selectedUnits.value.length) {
+    return 0
+  }
+
+  return Math.max(
+    ...selectedUnits.value.map(unit => Number(unit.pricePerNight))
+  )
 })
 
 function openFilePicker() {
@@ -141,7 +149,6 @@ async function createListing() {
         title: form.title,
         location: form.location,
         description: form.description,
-        pricePerNight: lowestPrice.value,
         rating: form.rating,
         images: uploadedImageUrls,
         amenities: form.amenities.filter(amenity => amenity.trim() !== ''),
@@ -149,8 +156,8 @@ async function createListing() {
         units: selectedUnits.value.map(unit => ({
           type: unit.type,
           label: unit.label,
-          quantity: unit.quantity,
-          pricePerNight: unit.pricePerNight
+          quantity: Number(unit.quantity),
+          pricePerNight: Number(unit.pricePerNight)
         }))
       }
     })
@@ -184,7 +191,7 @@ onUnmounted(() => {
   <div class="min-h-screen bg-white text-slate-900">
     <UContainer class="py-12">
       <header class="mb-8">
-        <h1 class="mb-2 text-4xl font-bold tracking-tight text-slate-900 md:text-5xl">
+        <h1 class="mb-6 text-4xl font-bold tracking-tight text-slate-900 md:text-5xl">
           Create Listing
         </h1>
 

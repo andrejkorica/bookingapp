@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -24,9 +24,9 @@ public class ListingEntity {
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    private BigDecimal pricePerNight;
-
     private Integer rating;
+
+    private LocalDate availableFrom;
 
     @ElementCollection
     @CollectionTable(name = "listing_images", joinColumns = @JoinColumn(name = "listing_id"))
@@ -37,6 +37,9 @@ public class ListingEntity {
     @CollectionTable(name = "listing_amenities", joinColumns = @JoinColumn(name = "listing_id"))
     @Column(name = "amenity")
     private List<String> amenities;
+
+    @OneToMany(mappedBy = "listing", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ListingUnitEntity> units;
 
     @ManyToOne
     @JoinColumn(name = "seller_id", nullable = false)

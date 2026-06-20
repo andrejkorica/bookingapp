@@ -2,7 +2,6 @@
 export type ListingUnit = {
   type: string
   label: string
-  enabled: boolean
   quantity: number
   pricePerNight: number
 }
@@ -12,10 +11,10 @@ const listingUnits = defineModel<ListingUnit[]>({
 })
 
 const selectedUnits = computed(() =>
-  listingUnits.value.filter((unit: ListingUnit) =>
-    unit.enabled &&
-    unit.quantity > 0 &&
-    unit.pricePerNight > 0
+  listingUnits.value.filter(
+    (unit: ListingUnit) =>
+      unit.quantity > 0 &&
+      unit.pricePerNight > 0
   )
 )
 
@@ -55,19 +54,27 @@ const highestPrice = computed(() => {
         <div
           v-for="unit in listingUnits"
           :key="unit.type"
-          class="grid grid-cols-1 gap-3 rounded-xl border border-slate-200 p-4 md:grid-cols-4 md:items-center"
+          class="grid grid-cols-1 gap-3 rounded-xl border p-4 transition-all md:grid-cols-4 md:items-center"
+          :class="
+            unit.quantity > 0
+              ? 'border-violet-500 bg-violet-50'
+              : 'border-slate-200 bg-white'
+          "
         >
-          <UCheckbox
-            v-model="unit.enabled"
-            :label="unit.label"
-          />
+          <div>
+            <p class="font-medium text-slate-900">
+              {{ unit.label }}
+            </p>
+            <p class="text-xs text-slate-500">
+              Unit type
+            </p>
+          </div>
 
           <UInput
             v-model.number="unit.quantity"
             type="number"
             min="0"
             placeholder="How many?"
-            :disabled="!unit.enabled"
           />
 
           <UInput
@@ -76,11 +83,15 @@ const highestPrice = computed(() => {
             min="0"
             icon="i-lucide-euro"
             placeholder="Price per night"
-            :disabled="!unit.enabled"
+            :disabled="unit.quantity <= 0"
           />
 
           <p class="text-sm text-slate-500">
-            {{ unit.enabled ? 'Available unit type' : 'Not offered' }}
+            {{
+              unit.quantity > 0
+                ? 'Available unit type'
+                : 'Enter quantity to offer this unit'
+            }}
           </p>
         </div>
       </div>

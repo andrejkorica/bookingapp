@@ -4,6 +4,7 @@ import hr.pocetnik.bookingapp.dto.listing.ListingRequest;
 import hr.pocetnik.bookingapp.dto.listing.ListingResponse;
 import hr.pocetnik.bookingapp.model.ListingEntity;
 import hr.pocetnik.bookingapp.model.ListingStatus;
+import hr.pocetnik.bookingapp.model.ListingUnitEntity;
 import hr.pocetnik.bookingapp.model.UserEntity;
 import hr.pocetnik.bookingapp.repository.ListingRepository;
 import hr.pocetnik.bookingapp.repository.UserRepository;
@@ -38,12 +39,29 @@ public class ListingServiceImpl implements ListingService {
                 listing.setTitle(request.getTitle());
                 listing.setLocation(request.getLocation());
                 listing.setDescription(request.getDescription());
-                listing.setPricePerNight(request.getPricePerNight());
                 listing.setRating(request.getRating());
                 listing.setImages(request.getImages());
                 listing.setAmenities(request.getAmenities());
+                listing.setAvailableFrom(request.getAvailableFrom());
                 listing.setSeller(seller);
                 listing.setStatus(ListingStatus.PENDING);
+
+                List<ListingUnitEntity> units = request.getUnits()
+                                .stream()
+                                .map(unitRequest -> {
+                                        ListingUnitEntity unit = new ListingUnitEntity();
+
+                                        unit.setType(unitRequest.getType());
+                                        unit.setLabel(unitRequest.getLabel());
+                                        unit.setQuantity(unitRequest.getQuantity());
+                                        unit.setPricePerNight(unitRequest.getPricePerNight());
+                                        unit.setListing(listing);
+
+                                        return unit;
+                                })
+                                .toList();
+
+                listing.setUnits(units);
 
                 ListingEntity savedListing = listingRepository.save(listing);
 
@@ -129,12 +147,28 @@ public class ListingServiceImpl implements ListingService {
                 response.setTitle(listing.getTitle());
                 response.setLocation(listing.getLocation());
                 response.setDescription(listing.getDescription());
-                response.setPricePerNight(listing.getPricePerNight());
                 response.setRating(listing.getRating());
                 response.setImages(listing.getImages());
                 response.setAmenities(listing.getAmenities());
+                response.setAvailableFrom(listing.getAvailableFrom());
                 response.setStatus(listing.getStatus());
                 response.setCreatedAt(listing.getCreatedAt());
+
+                response.setUnits(
+                                listing.getUnits()
+                                                .stream()
+                                                .map(unit -> {
+                                                        var unitResponse = new hr.pocetnik.bookingapp.dto.listing.ListingUnitResponse();
+
+                                                        unitResponse.setId(unit.getId());
+                                                        unitResponse.setType(unit.getType());
+                                                        unitResponse.setLabel(unit.getLabel());
+                                                        unitResponse.setQuantity(unit.getQuantity());
+                                                        unitResponse.setPricePerNight(unit.getPricePerNight());
+
+                                                        return unitResponse;
+                                                })
+                                                .toList());
 
                 if (listing.getSeller() != null) {
                         response.setSellerEmail(
