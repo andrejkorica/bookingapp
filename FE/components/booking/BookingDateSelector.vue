@@ -11,6 +11,10 @@ const dateRange = defineModel<DateRangeValue>({
   required: true
 })
 
+const props = defineProps<{
+  minDate?: DateValue | undefined
+}>()
+
 const minDate = today(getLocalTimeZone())
 
 const isDateUnavailable = (date: DateValue) => {
@@ -33,6 +37,7 @@ const isDateUnavailable = (date: DateValue) => {
         :is-date-unavailable="isDateUnavailable"
         :number-of-months="2"
         size="lg"
+        :min-value="props.minDate"
         color="primary"
       />
     </div>

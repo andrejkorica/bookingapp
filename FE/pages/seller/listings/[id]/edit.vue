@@ -6,6 +6,9 @@ import CreateListingUnits, {
   type ListingUnit,
 } from "../../../../components/listings/CreateListingUnits.vue";
 import CreateListingAvailability from "../../../../components/listings/CreateListingAvailability.vue";
+import CreateListingPriceAdjustments, {
+  type PriceAdjustment,
+} from "../../../../components/listings/CreateListingPriceAdjustments.vue";
 
 definePageMeta({
   layout: "default",
@@ -24,6 +27,7 @@ type Listing = {
   amenities: string[];
   availableFrom: string;
   units: ListingUnit[];
+  priceAdjustments: PriceAdjustment[];
   status: string;
 };
 
@@ -62,6 +66,14 @@ const listingUnits = ref<ListingUnit[]>(
 );
 
 const availableFrom = shallowRef<DateValue>(today(getLocalTimeZone()));
+
+const priceAdjustments = ref<PriceAdjustment[]>([
+  {
+    startDate: "",
+    endDate: "",
+    percent: 0,
+  },
+]);
 
 const previewImages = computed(() =>
   images.value.map((image) => image.previewUrl),
@@ -150,6 +162,20 @@ async function fetchListing() {
     availableFrom.value = listing.availableFrom
       ? parseDate(listing.availableFrom)
       : today(getLocalTimeZone());
+
+    priceAdjustments.value = listing.priceAdjustments?.length
+      ? listing.priceAdjustments.map((adjustment) => ({
+          startDate: adjustment.startDate,
+          endDate: adjustment.endDate,
+          percent: Number(adjustment.percent),
+        }))
+      : [
+          {
+            startDate: "",
+            endDate: "",
+            percent: 0,
+          },
+        ];
 
     const savedUnits = listing.units || [];
 
@@ -242,6 +268,18 @@ async function updateListing() {
             quantity: Number(unit.quantity),
             pricePerNight: Number(unit.pricePerNight),
           })),
+          priceAdjustments: priceAdjustments.value
+            .filter(
+              (adjustment) =>
+                adjustment.startDate &&
+                adjustment.endDate &&
+                Number(adjustment.percent) > 0,
+            )
+            .map((adjustment) => ({
+              startDate: adjustment.startDate,
+              endDate: adjustment.endDate,
+              percent: Number(adjustment.percent),
+            })),
         },
       },
     );
@@ -450,6 +488,12 @@ onUnmounted(() => {
             <CreateListingUnits v-model="listingUnits" />
 
             <CreateListingAvailability v-model="availableFrom" />
+
+            <CreateListingAvailability v-model="availableFrom" />
+
+            <div class="my-10 border-t border-slate-200" />
+
+            <CreateListingPriceAdjustments v-model="priceAdjustments" />
           </div>
 
           <div>

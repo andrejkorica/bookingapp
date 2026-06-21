@@ -1,23 +1,61 @@
 <script setup lang="ts">
+import { breakpointsTailwind, useBreakpoints } from '@vueuse/core'
+import { DateFormatter, getLocalTimeZone, parseDate } from '@internationalized/date'
+import type { DateValue } from '@internationalized/date'
+
 export type PriceAdjustment = {
   startDate: string
   endDate: string
   percent: number
 }
 
+type DateRangeValue = {
+  start: DateValue | undefined
+  end: DateValue | undefined
+}
+
 const priceAdjustments = defineModel<PriceAdjustment[]>({
   required: true
 })
 
-const startDateInputs = ref<HTMLInputElement[]>([])
-const endDateInputs = ref<HTMLInputElement[]>([])
+const tz = getLocalTimeZone()
+const df = new DateFormatter('en-US', { dateStyle: 'medium' })
 
-function openStartPicker(index: number) {
-  startDateInputs.value[index]?.showPicker?.()
+const breakpoints = useBreakpoints(breakpointsTailwind)
+const isDesktop = breakpoints.greaterOrEqual('sm')
+
+function getDateRange(adjustment: PriceAdjustment): DateRangeValue {
+  return {
+    start: adjustment.startDate ? parseDate(adjustment.startDate) : undefined,
+    end: adjustment.endDate ? parseDate(adjustment.endDate) : undefined
+  }
 }
 
-function openEndPicker(index: number) {
-  endDateInputs.value[index]?.showPicker?.()
+function setDateRange(index: number, value: DateRangeValue | null | undefined) {
+  const adjustment = priceAdjustments.value[index]
+
+  if (!adjustment) {
+    return
+  }
+
+  adjustment.startDate = value?.start?.toString() || ''
+  adjustment.endDate = value?.end?.toString() || ''
+}
+
+function getDateLabel(adjustment: PriceAdjustment) {
+  if (!adjustment.startDate) {
+    return 'Pick date range'
+  }
+
+  const start = parseDate(adjustment.startDate)
+
+  if (!adjustment.endDate) {
+    return df.format(start.toDate(tz))
+  }
+
+  const end = parseDate(adjustment.endDate)
+
+  return `${df.format(start.toDate(tz))} - ${df.format(end.toDate(tz))}`
 }
 
 function addAdjustment() {
@@ -44,61 +82,29 @@ function removeAdjustment(index: number) {
         v-for="(adjustment, index) in priceAdjustments"
         :key="index"
       >
-        <div class="grid grid-cols-1 gap-4 md:grid-cols-[1fr_1fr_180px_auto] md:items-end">
-          <UFormField label="Start Date">
-            <div class="relative flex gap-2">
-              <input
-                :ref="el => {
-                  if (el) startDateInputs[index] = el as HTMLInputElement
-                }"
-                v-model="adjustment.startDate"
-                type="date"
-                class="absolute inset-0 h-full w-full opacity-0 pointer-events-none"
-                tabindex="-1"
-              >
-
-              <UInput
-                :model-value="adjustment.startDate"
-                readonly
-                placeholder="Select start date"
-                class="flex-1"
-              />
-
+        <div class="grid grid-cols-1 gap-4 md:grid-cols-[1fr_180px_auto] md:items-end">
+          <UFormField label="Date Range">
+            <UPopover :content="{ align: 'start' }">
               <UButton
-                icon="i-lucide-calendar"
                 color="neutral"
-                variant="soft"
-                @click="openStartPicker(index)"
-              />
-            </div>
-          </UFormField>
-
-          <UFormField label="End Date">
-            <div class="relative flex gap-2">
-              <input
-                :ref="el => {
-                  if (el) endDateInputs[index] = el as HTMLInputElement
-                }"
-                v-model="adjustment.endDate"
-                type="date"
-                class="absolute inset-0 h-full w-full opacity-0 pointer-events-none"
-                tabindex="-1"
+                variant="subtle"
+                icon="i-lucide-calendar"
+                block
+                class="justify-start"
               >
+                {{ getDateLabel(adjustment) }}
+              </UButton>
 
-              <UInput
-                :model-value="adjustment.endDate"
-                readonly
-                placeholder="Select end date"
-                class="flex-1"
-              />
-
-              <UButton
-                icon="i-lucide-calendar"
-                color="neutral"
-                variant="soft"
-                @click="openEndPicker(index)"
-              />
-            </div>
+              <template #content>
+                <UCalendar
+                  :model-value="getDateRange(adjustment)"
+                  class="p-2"
+                  :number-of-months="isDesktop ? 2 : 1"
+                  range
+                  @update:model-value="setDateRange(index, $event as DateRangeValue)"
+                />
+              </template>
+            </UPopover>
           </UFormField>
 
           <UFormField label="Increase %">

@@ -2,6 +2,8 @@
 type UnitType = {
   label: string
   value: string
+  quantity: number
+  pricePerNight: number
 }
 
 const selectedUnit = defineModel<string>({
@@ -34,21 +36,25 @@ defineProps<{
         "
         @click="selectedUnit = unit.value"
       >
-        <div class="flex items-center justify-between gap-3">
+        <div class="flex items-start justify-between gap-3">
           <div>
             <p class="font-semibold text-slate-900">
               {{ unit.label }}
             </p>
 
             <p class="mt-1 text-sm text-slate-500">
-              Select this unit type for your stay.
+              {{ unit.quantity }} available
+            </p>
+
+            <p class="mt-3 text-lg font-bold text-slate-900">
+              €{{ unit.pricePerNight }} / night
             </p>
           </div>
 
           <UIcon
             v-if="selectedUnit === unit.value"
             name="i-lucide-check-circle"
-            class="size-5 text-indigo-600"
+            class="size-5 shrink-0 text-indigo-600"
           />
         </div>
       </button>

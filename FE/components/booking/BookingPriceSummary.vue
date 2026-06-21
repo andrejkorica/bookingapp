@@ -53,7 +53,7 @@ const emit = defineEmits<{
         </div>
 
         <div class="rounded-xl bg-slate-50 p-3 text-xs text-slate-500">
-          Price will be calculated from the selected unit and dates once unit pricing is connected.
+          The displayed total includes any applicable seasonal price adjustments for the selected dates.
         </div>
 
         <div class="border-t border-slate-200 pt-4">
@@ -63,7 +63,7 @@ const emit = defineEmits<{
             </span>
 
             <span class="text-3xl font-bold text-slate-900">
-              To be calculated
+              €{{ totalPrice }}
             </span>
           </div>
         </div>
