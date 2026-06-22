@@ -1,5 +1,16 @@
 <script setup lang="ts">
 const config = useRuntimeConfig();
+import ListingLocationMap from "~/components/listings/ListingLocationMap.vue";
+
+type BookingListing = {
+  location: string;
+  latitude: number | null;
+  longitude: number | null;
+};
+
+defineProps<{
+  listing: BookingListing | null;
+}>();
 
 const guestInfo = reactive({
   name: "",
@@ -165,37 +176,38 @@ onMounted(fetchCurrentUser);
         <h2 class="text-xl font-semibold">Getting there</h2>
       </template>
 
-      <div
-        class="flex h-64 items-center justify-center rounded-lg border border-dashed border-slate-300 bg-slate-100 text-slate-500">
-        Interactive map placeholder
-      </div>
+      <ListingLocationMap
+        v-if="listing"
+        :location="listing.location"
+        :latitude="listing.latitude"
+        :longitude="listing.longitude" />
     </UCard>
 
-   <div class="sticky bottom-0 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-  <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-    <UButton
-      label="Back"
-      variant="ghost"
-      color="neutral"
-      icon="i-heroicons-arrow-left"
-      @click="emit('back')"
-    />
+    <div
+      class="sticky bottom-0 rounded-xl border border-slate-200 bg-white p-4 shadow-sm z-99999">
+      <div
+        class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <UButton
+          label="Back"
+          variant="ghost"
+          color="neutral"
+          icon="i-heroicons-arrow-left"
+          @click="emit('back')" />
 
-    <div class="flex flex-col items-end gap-2 sm:flex-row sm:items-center">
-      <p class="text-sm text-slate-500">
-        Review your guest details before continuing.
-      </p>
+        <div class="flex flex-col items-end gap-2 sm:flex-row sm:items-center">
+          <p class="text-sm text-slate-500">
+            Review your guest details before continuing.
+          </p>
 
-      <UButton
-        label="Continue to payment"
-        color="primary"
-        trailing-icon="i-heroicons-arrow-right"
-        :disabled="!canContinue"
-        class="px-6 text-white"
-        @click="emit('continue')"
-      />
+          <UButton
+            label="Continue to payment"
+            color="primary"
+            trailing-icon="i-heroicons-arrow-right"
+            :disabled="!canContinue"
+            class="px-6 text-white"
+            @click="emit('continue')" />
+        </div>
+      </div>
     </div>
-  </div>
-</div>
   </div>
 </template>

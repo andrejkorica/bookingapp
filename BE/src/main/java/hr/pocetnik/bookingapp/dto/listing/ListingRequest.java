@@ -32,4 +32,8 @@ public class ListingRequest {
     private List<ListingUnitRequest> units;
 
     private List<ListingPriceAdjustmentRequest> priceAdjustments;
+
+    private Double latitude;
+    
+    private Double longitude;
 }

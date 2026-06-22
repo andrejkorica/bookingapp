@@ -9,6 +9,8 @@ import CreateListingAvailability from "../../../../components/listings/CreateLis
 import CreateListingPriceAdjustments, {
   type PriceAdjustment,
 } from "../../../../components/listings/CreateListingPriceAdjustments.vue";
+import CreateListingLocation from "../../../../components/listings/CreateListingLocation.vue";
+import CreateListingImagePreview from "../../../../components/listings/CreateListingImagePreview.vue";
 
 definePageMeta({
   layout: "default",
@@ -29,6 +31,8 @@ type Listing = {
   units: ListingUnit[];
   priceAdjustments: PriceAdjustment[];
   status: string;
+  latitude: number | null;
+  longitude: number | null;
 };
 
 type ListingImage = {
@@ -52,6 +56,8 @@ const form = reactive({
   rating: 5,
   description: "",
   amenities: [""],
+  latitude: null as number | null,
+  longitude: null as number | null,
 });
 
 const images = ref<ListingImage[]>([]);
@@ -76,7 +82,9 @@ const priceAdjustments = ref<PriceAdjustment[]>([
 ]);
 
 const previewImages = computed(() =>
-  images.value.map((image) => image.previewUrl),
+  images.value.map((image) => ({
+    previewUrl: image.previewUrl,
+  })),
 );
 
 const selectedUnits = computed(() =>
@@ -158,6 +166,8 @@ async function fetchListing() {
     form.rating = listing.rating;
     form.description = listing.description;
     form.amenities = listing.amenities?.length ? [...listing.amenities] : [""];
+    form.latitude = listing.latitude;
+    form.longitude = listing.longitude;
 
     availableFrom.value = listing.availableFrom
       ? parseDate(listing.availableFrom)
@@ -268,6 +278,8 @@ async function updateListing() {
             quantity: Number(unit.quantity),
             pricePerNight: Number(unit.pricePerNight),
           })),
+          latitude: form.latitude,
+          longitude: form.longitude,
           priceAdjustments: priceAdjustments.value
             .filter(
               (adjustment) =>
@@ -341,18 +353,12 @@ onUnmounted(() => {
               to="/seller/listings/manage" />
           </div>
 
-          <UInput
-            v-model="form.title"
-            placeholder="Property title"
-            size="xl"
-            class="mb-4" />
-
           <div class="flex flex-col gap-4 md:flex-row md:items-center">
             <UInput
-              v-model="form.location"
-              placeholder="Property location"
-              icon="i-heroicons-map-pin"
-              class="w-full md:max-w-xl" />
+              v-model="form.title"
+              placeholder="Property title"
+              size="xl"
+              />
 
             <UInput
               v-model.number="form.rating"
@@ -365,33 +371,7 @@ onUnmounted(() => {
           </div>
         </header>
 
-        <div class="mb-12">
-          <UCarousel
-            v-if="previewImages.length"
-            v-slot="{ item }"
-            :items="previewImages"
-            :ui="{ item: 'basis-full' }"
-            :prev="{ color: 'primary' }"
-            :next="{ color: 'primary' }"
-            class="overflow-hidden rounded-2xl shadow-lg"
-            arrows
-            indicators>
-            <img
-              :src="item"
-              class="h-96 w-full object-cover"
-              draggable="false" />
-          </UCarousel>
-
-          <UCard
-            v-else
-            class="flex h-96 items-center justify-center rounded-2xl border border-dashed border-slate-300 bg-slate-50">
-            <div class="text-center text-slate-500">
-              <UIcon name="i-lucide-image-plus" class="mx-auto mb-3 size-10" />
-
-              <p class="font-medium">Upload photos to preview your listing.</p>
-            </div>
-          </UCard>
-        </div>
+        <CreateListingImagePreview :images="previewImages" />
 
         <div class="grid grid-cols-1 gap-12 lg:grid-cols-3">
           <div class="lg:col-span-2">
@@ -404,6 +384,11 @@ onUnmounted(() => {
               :rows="8"
               placeholder="Describe your property..."
               class="mb-8 w-full" />
+
+            <CreateListingLocation
+              v-model:location="form.location"
+              v-model:latitude="form.latitude"
+              v-model:longitude="form.longitude" />
 
             <h3 class="mb-4 text-xl font-bold">Images</h3>
 
@@ -486,8 +471,6 @@ onUnmounted(() => {
             <div class="my-10 border-t border-slate-200" />
 
             <CreateListingUnits v-model="listingUnits" />
-
-            <CreateListingAvailability v-model="availableFrom" />
 
             <CreateListingAvailability v-model="availableFrom" />
 

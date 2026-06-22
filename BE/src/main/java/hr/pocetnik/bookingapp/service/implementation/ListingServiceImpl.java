@@ -51,6 +51,8 @@ public class ListingServiceImpl implements ListingService {
         listing.setStatus(ListingStatus.PENDING);
         listing.setLowestPrice(request.getLowestPrice());
         listing.setHighestPrice(request.getHighestPrice());
+        listing.setLatitude(request.getLatitude());
+        listing.setLongitude(request.getLongitude());
 
         listing.setUnits(mapUnits(request, listing));
         listing.setPriceAdjustments(mapPriceAdjustments(request, listing));
@@ -156,6 +158,8 @@ public class ListingServiceImpl implements ListingService {
         listing.setImages(request.getImages());
         listing.setAmenities(request.getAmenities());
         listing.setAvailableFrom(request.getAvailableFrom());
+        listing.setLatitude(request.getLatitude());
+        listing.setLongitude(request.getLongitude());
 
         if (listing.getUnits() == null) {
             listing.setUnits(new ArrayList<>());
@@ -240,6 +244,8 @@ public class ListingServiceImpl implements ListingService {
         response.setCreatedAt(listing.getCreatedAt());
         response.setLowestPrice(listing.getLowestPrice());
         response.setHighestPrice(listing.getHighestPrice());
+        response.setLatitude(listing.getLatitude());
+        response.setLongitude(listing.getLongitude());
 
         if (listing.getUnits() != null) {
             response.setUnits(

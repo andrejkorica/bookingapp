@@ -73,6 +73,9 @@ type PriceAdjustment = {
 type Listing = {
   id: number;
   title: string;
+  location: string;
+  latitude: number | null;
+  longitude: number | null;
   availableFrom: string;
   units: ListingUnit[];
   priceAdjustments: PriceAdjustment[];
@@ -306,6 +309,7 @@ watchEffect(() => {
         <div v-else-if="step === 2">
           <BookingGuestInfo
             v-model="guestInfo"
+            :listing="listing"
             @back="goBackToDates"
             @continue="goToPayment" />
         </div>

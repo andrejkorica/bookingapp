@@ -42,4 +42,8 @@ public class ListingResponse {
     private String sellerEmail;
 
     private List<ListingPriceAdjustmentResponse> priceAdjustments;
+
+    private Double latitude;
+
+    private Double longitude;
 }

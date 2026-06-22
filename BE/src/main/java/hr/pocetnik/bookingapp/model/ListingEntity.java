@@ -49,6 +49,9 @@ public class ListingEntity {
     @JoinColumn(name = "seller_id", nullable = false)
     private UserEntity seller;
 
+    private Double latitude;
+    private Double longitude;
+
     @Enumerated(EnumType.STRING)
     private ListingStatus status;
 

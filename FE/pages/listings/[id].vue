@@ -7,7 +7,8 @@
 
       <div v-else-if="listingData">
         <header class="mb-8">
-          <h1 class="text-4xl md:text-5xl font-bold tracking-tight text-slate-900 mb-2">
+          <h1
+            class="text-4xl md:text-5xl font-bold tracking-tight text-slate-900 mb-2">
             {{ listingData.title }}
           </h1>
 
@@ -18,13 +19,18 @@
                   v-for="i in 5"
                   :key="i"
                   name="i-heroicons-star-solid"
-                  :class="i <= listingData.rating ? 'text-yellow-400' : 'text-slate-200'"
-                  class="w-5 h-5"
-                />
+                  :class="
+                    i <= listingData.rating
+                      ? 'text-yellow-400'
+                      : 'text-slate-200'
+                  "
+                  class="w-5 h-5" />
               </div>
 
               <div class="flex min-w-0 items-center">
-                <UIcon name="i-heroicons-map-pin" class="w-5 h-5 mr-2 shrink-0" />
+                <UIcon
+                  name="i-heroicons-map-pin"
+                  class="w-5 h-5 mr-2 shrink-0" />
                 <span class="truncate">{{ listingData.location }}</span>
               </div>
             </div>
@@ -35,36 +41,12 @@
               variant="soft"
               color="neutral"
               class="shrink-0"
-              @click="router.back()"
-            />
+              @click="router.back()" />
           </div>
         </header>
 
         <div class="mb-12">
-          <UCarousel
-            v-if="listingData.images?.length"
-            v-slot="{ item }"
-            :items="listingData.images"
-            :ui="{ item: 'basis-full' }"
-            :prev="{ color: 'primary' }"
-            :next="{ color: 'primary' }"
-            class="rounded-2xl overflow-hidden shadow-lg"
-            arrows
-            indicators
-          >
-            <img
-              :src="item"
-              class="w-full h-96 object-cover"
-              draggable="false"
-            >
-          </UCarousel>
-
-          <div
-            v-else
-            class="h-96 rounded-2xl bg-slate-100 flex items-center justify-center text-slate-400"
-          >
-            No images uploaded.
-          </div>
+          <CreateListingImagePreview :images="previewImages" />
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-12">
@@ -77,45 +59,38 @@
               {{ listingData.description }}
             </p>
 
-            <h3 class="text-xl font-bold mb-4">
-              Amenities
-            </h3>
+            <ListingLocationMap
+              :location="listingData.location"
+              :latitude="listingData.latitude"
+              :longitude="listingData.longitude" 
+              class="mb-6"/>
+
+            <h3 class="text-xl font-bold mb-4">Amenities</h3>
 
             <ul
               v-if="listingData.amenities?.length"
-              class="grid grid-cols-2 gap-x-8 gap-y-2"
-            >
+              class="grid grid-cols-2 gap-x-8 gap-y-2">
               <li
                 v-for="amenity in listingData.amenities"
                 :key="amenity"
-                class="flex items-center"
-              >
+                class="flex items-center">
                 <UIcon
                   name="i-heroicons-check-circle"
-                  class="w-5 h-5 text-indigo-500 mr-3"
-                />
+                  class="w-5 h-5 text-indigo-500 mr-3" />
                 <span class="text-slate-600">{{ amenity }}</span>
               </li>
             </ul>
 
-            <p v-else class="text-slate-500">
-              No amenities listed.
-            </p>
+            <p v-else class="text-slate-500">No amenities listed.</p>
 
             <div class="mt-10">
-              <h3 class="text-xl font-bold mb-4">
-                Available units
-              </h3>
+              <h3 class="text-xl font-bold mb-4">Available units</h3>
 
-              <div
-                v-if="listingData.units?.length"
-                class="space-y-3"
-              >
+              <div v-if="listingData.units?.length" class="space-y-3">
                 <div
                   v-for="unit in listingData.units"
                   :key="unit.type"
-                  class="flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50 p-4"
-                >
+                  class="flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50 p-4">
                   <div>
                     <p class="font-semibold text-slate-900">
                       {{ unit.label }}
@@ -132,18 +107,14 @@
                 </div>
               </div>
 
-              <p v-else class="text-slate-500">
-                No units listed.
-              </p>
+              <p v-else class="text-slate-500">No units listed.</p>
             </div>
           </div>
 
           <div>
             <UCard class="bg-white shadow-lg border border-slate-200">
               <div class="text-center space-y-4">
-                <p class="text-lg text-slate-500">
-                  Price per night
-                </p>
+                <p class="text-lg text-slate-500">Price per night</p>
 
                 <p class="text-4xl font-bold text-slate-900">
                   {{ priceLabel }}
@@ -155,8 +126,11 @@
                   block
                   class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold"
                   :disabled="!authStore.user || isOwner"
-                  :to="authStore.user && !isOwner ? `/bookings/create?listingId=${listingData.id}` : undefined"
-                />
+                  :to="
+                    authStore.user && !isOwner
+                      ? `/bookings/create?listingId=${listingData.id}`
+                      : undefined
+                  " />
 
                 <p v-if="!authStore.user" class="text-sm text-slate-500">
                   You need to log in before booking this listing.
@@ -175,7 +149,8 @@
             Reviews and Comments (0)
           </h2>
 
-          <div class="p-5 border border-slate-200 rounded-xl bg-slate-50 text-slate-500">
+          <div
+            class="p-5 border border-slate-200 rounded-xl bg-slate-50 text-slate-500">
             No reviews yet.
           </div>
         </div>
@@ -189,99 +164,111 @@
 </template>
 
 <script setup lang="ts">
-import { useAuthStore } from '~/stores/auth'
+import { useAuthStore } from "~/stores/auth";
+import CreateListingImagePreview from "~/components/listings/CreateListingImagePreview.vue";
+import ListingLocationMap from "~/components/listings/ListingLocationMap.vue";
 
 type ListingUnit = {
-  id?: number
-  type: string
-  label: string
-  quantity: number
-  pricePerNight: number
-}
+  id?: number;
+  type: string;
+  label: string;
+  quantity: number;
+  pricePerNight: number;
+};
 
 type Listing = {
-  id: number
-  title: string
-  location: string
-  description: string
-  lowestPrice: number
-  highestPrice: number
-  rating: number
-  images: string[]
-  amenities: string[]
-  availableFrom: string
-  units: ListingUnit[]
-  status: string
-  sellerEmail: string
-  createdAt: string
-}
+  id: number;
+  title: string;
+  location: string;
+  latitude: number | null;
+  longitude: number | null;
+  description: string;
+  lowestPrice: number;
+  highestPrice: number;
+  rating: number;
+  images: string[];
+  amenities: string[];
+  availableFrom: string;
+  units: ListingUnit[];
+  status: string;
+  sellerEmail: string;
+  createdAt: string;
+};
 
-const route = useRoute()
-const router = useRouter()
-const config = useRuntimeConfig()
-const authStore = useAuthStore()
+const previewImages = computed(() => {
+  return (
+    listingData.value?.images.map((image) => ({
+      previewUrl: image,
+    })) ?? []
+  );
+});
 
-const listingData = ref<Listing | null>(null)
-const isLoading = ref(false)
+const route = useRoute();
+const router = useRouter();
+const config = useRuntimeConfig();
+const authStore = useAuthStore();
+
+const listingData = ref<Listing | null>(null);
+const isLoading = ref(false);
 
 const isAvailableForBooking = computed(() => {
   if (!listingData.value?.availableFrom) {
-    return true
+    return true;
   }
 
-  const today = new Date()
-  const availableFrom = new Date(listingData.value.availableFrom)
+  const today = new Date();
+  const availableFrom = new Date(listingData.value.availableFrom);
 
-  today.setHours(0, 0, 0, 0)
-  availableFrom.setHours(0, 0, 0, 0)
+  today.setHours(0, 0, 0, 0);
+  availableFrom.setHours(0, 0, 0, 0);
 
-  return availableFrom <= today
-})
+  return availableFrom <= today;
+});
 
 const priceLabel = computed(() => {
   if (!listingData.value) {
-    return 'Price not set'
+    return "Price not set";
   }
 
   if (!listingData.value.lowestPrice && !listingData.value.highestPrice) {
-    return 'Price not set'
+    return "Price not set";
   }
 
   if (listingData.value.lowestPrice === listingData.value.highestPrice) {
-    return `€${listingData.value.lowestPrice}`
+    return `€${listingData.value.lowestPrice}`;
   }
 
-  return `€${listingData.value.lowestPrice} - €${listingData.value.highestPrice}`
-})
+  return `€${listingData.value.lowestPrice} - €${listingData.value.highestPrice}`;
+});
 
 const isOwner = computed(() => {
   if (!authStore.user || !listingData.value) {
-    return false
+    return false;
   }
 
-  return authStore.user.email === listingData.value.sellerEmail
-})
+  return authStore.user.email === listingData.value.sellerEmail;
+});
 
 async function fetchListing() {
-  isLoading.value = true
+  isLoading.value = true;
 
   try {
     listingData.value = await $fetch<Listing>(
-      `${config.public.apiBase}/listings/${route.params.id}`
-    )
+      `${config.public.apiBase}/listings/${route.params.id}`,
+    );
   } catch (error) {
-    console.error(error)
-    listingData.value = null
+    console.error(error);
+    listingData.value = null;
   } finally {
-    isLoading.value = false
+    isLoading.value = false;
   }
 }
 
-onMounted(fetchListing)
+onMounted(fetchListing);
 
 useHead(() => ({
   title: listingData.value
     ? `${listingData.value.title} | Details`
-    : 'Listing Details'
-}))
+    : "Listing Details",
+}));
 </script>
