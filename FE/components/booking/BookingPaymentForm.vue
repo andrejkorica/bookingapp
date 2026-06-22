@@ -101,6 +101,7 @@ const canConfirm = computed(() => {
         <UCheckbox
           v-model="paymentInfo.agreedToCancellationPolicy"
           label="I understand the cancellation policy."
+          
         />
 
         <UCheckbox
