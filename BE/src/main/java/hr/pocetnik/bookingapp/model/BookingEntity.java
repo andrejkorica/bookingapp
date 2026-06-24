@@ -78,7 +78,7 @@ public class BookingEntity {
         createdAt = LocalDateTime.now();
 
         if (status == null) {
-            status = BookingStatus.CONFIRMED;
+            status = BookingStatus.PENDING;
         }
     }
 }
