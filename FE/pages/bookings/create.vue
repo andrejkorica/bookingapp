@@ -43,13 +43,61 @@ function goBackToGuestInfo() {
   step.value = 2;
 }
 
-function confirmBooking() {
-  console.log("guestInfo", guestInfo);
-  console.log("paymentInfo", paymentInfo);
-  console.log("listing", listing.value);
-  console.log("selectedUnit", selectedUnit.value);
-  console.log("dateRange", dateRange.value);
-  console.log("totalPrice", totalPrice.value);
+const isSubmittingBooking = ref(false)
+
+const toast = useToast()
+
+async function confirmBooking() {
+  if (!listing.value || !dateRange.value.start || !dateRange.value.end) {
+    return
+  }
+
+  try {
+    await $fetch(`${config.public.apiBase}/bookings`, {
+      method: "POST",
+      credentials: "include",
+      body: {
+        listingId: listing.value.id,
+        unitType: selectedUnit.value,
+
+        checkIn: dateRange.value.start.toString(),
+        checkOut: dateRange.value.end.toString(),
+
+        guestName: guestInfo.name,
+        guestSurname: guestInfo.surname,
+        guestEmail: guestInfo.email,
+        guestPhoneNumber: guestInfo.phoneNumber,
+
+        travelPurpose: guestInfo.travelPurpose,
+        arrivalTime: guestInfo.arrivalTime,
+        arrivalMethod: guestInfo.arrivalMethod,
+        specialRequests: guestInfo.specialRequests,
+        hasPets: guestInfo.hasPets,
+        needsParking: guestInfo.needsParking,
+        accessibilityRequirements: guestInfo.accessibilityRequirements,
+
+        billingAddress: paymentInfo.billingAddress,
+        agreedToRules: paymentInfo.agreedToRules,
+        agreedToCancellationPolicy: paymentInfo.agreedToCancellationPolicy,
+        confirmedInfoCorrect: paymentInfo.confirmedInfoCorrect
+      }
+    })
+
+    toast.add({
+      title: "Booking confirmed",
+      description: "Your booking has been successfully created.",
+      color: "success"
+    })
+
+  } catch (error) {
+    console.error(error)
+
+    toast.add({
+      title: "Booking failed",
+      description: "Unable to create booking.",
+      color: "error"
+    })
+  }
 }
 
 type DateRangeValue = {
@@ -319,6 +367,7 @@ watchEffect(() => {
         <div v-else-if="step === 3">
           <BookingPaymentForm
             v-model="paymentInfo"
+            :loading="isSubmittingBooking"
             @back="goBackToGuestInfo"
             @confirm="confirmBooking" />
         </div>
