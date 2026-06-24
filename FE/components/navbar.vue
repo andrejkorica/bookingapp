@@ -117,7 +117,7 @@ const dropdownItems = computed<DropdownMenuItem[][]>(() => [
     {
       label: 'Booking History',
       icon: 'i-lucide-calendar',
-      onSelect: () => openModal('bookings')
+      onSelect: () => navigateTo('/bookings')
     }
   ],
   [

@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import type { TabsItem } from '@nuxt/ui'
-import BookingsTab from './options/bookingTab.vue'
 import SellerTab from './options/sellerTab.vue'
 import ProfileTab from './options/profileTab.vue'
 
@@ -45,7 +44,6 @@ const items: TabsItem[] = [
         <div class="min-h-[300px] overflow-y-auto p-2 pr-3">
           <ProfileTab v-if="selectedTab === 'profile'" />
           <SellerTab v-else-if="selectedTab === 'seller'" />
-          <BookingsTab v-else />
         </div>
       </div>
     </template>
