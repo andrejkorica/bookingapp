@@ -31,4 +31,6 @@ public class BookingResponse {
     private BookingStatus status;
 
     private LocalDateTime createdAt;
+    private String listingLocation;
+    private String listingImage;
 }

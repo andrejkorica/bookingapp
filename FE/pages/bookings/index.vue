@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import BookingCard from "~/components/booking/BookingCard.vue";
+
 definePageMeta({
   layout: "default",
 });
@@ -7,29 +9,126 @@ type BookingStatus = "PENDING" | "CONFIRMED" | "CANCELLED";
 
 type UserBooking = {
   id: number;
-  title: string;
-  location: string;
-  image: string;
+  listingId: number;
+  listingTitle: string;
+  listingLocation: string;
+  listingImage: string | null;
+
+  unitType: string;
+  unitLabel: string;
+
   checkIn: string;
   checkOut: string;
   nights: number;
+
+  pricePerNight: number;
   totalPrice: number;
+
   status: BookingStatus;
+  createdAt: string;
 };
+
+const config = useRuntimeConfig();
+const toast = useToast();
 
 const activeOpen = ref(true);
 const favoritesOpen = ref(true);
 const pastOpen = ref(false);
 
-const activeBookings = ref<UserBooking[]>([]);
+const bookings = ref<UserBooking[]>([]);
 const favorites = ref([]);
-const pastBookings = ref<UserBooking[]>([]);
 
-function statusColor(status: BookingStatus) {
-  if (status === "CONFIRMED") return "success";
-  if (status === "PENDING") return "warning";
-  return "error";
+const activeBookings = computed(() => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  return bookings.value.filter((booking) => {
+    const checkOut = new Date(booking.checkOut);
+    checkOut.setHours(0, 0, 0, 0);
+
+    return (
+      booking.status !== "CANCELLED" &&
+      checkOut >= today
+    );
+  });
+});
+
+
+
+const pastBookings = computed(() => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  return bookings.value.filter((booking) => {
+    const checkOut = new Date(booking.checkOut);
+    checkOut.setHours(0, 0, 0, 0);
+
+    return booking.status === "CANCELLED" || checkOut < today;
+  });
+});
+
+async function fetchBookings() {
+  try {
+    const response = await $fetch<any[]>(
+      `${config.public.apiBase}/bookings/me`,
+      {
+        credentials: "include",
+      }
+    );
+
+    bookings.value = response.map((booking) => ({
+      ...booking,
+      title: booking.listingTitle,
+      location: "Location not available",
+      image: "",
+    }));
+  } catch (error) {
+    console.error(error);
+
+    toast.add({
+      title: "Error",
+      description: "Failed to load your bookings.",
+      color: "error",
+    });
+  }
 }
+function viewListing(listingId: number) {
+  navigateTo(`/listings/${listingId}`);
+}
+
+function reviewRequest(bookingId: number) {
+  navigateTo(`/bookings/${bookingId}`);
+}
+
+async function cancelBooking(bookingId: number) {
+  try {
+    await $fetch(
+      `${config.public.apiBase}/bookings/${bookingId}/cancel`,
+      {
+        method: "POST",
+        credentials: "include",
+      }
+    );
+
+    toast.add({
+      title: "Booking cancelled",
+      description: "Your booking has been successfully cancelled.",
+      color: "success",
+    });
+
+    await fetchBookings();
+  } catch (error) {
+    console.error(error);
+
+    toast.add({
+      title: "Cancellation failed",
+      description: "Unable to cancel this booking.",
+      color: "error",
+    });
+  }
+}
+
+onMounted(fetchBookings);
 </script>
 
 <template>
@@ -57,80 +156,31 @@ function statusColor(status: BookingStatus) {
             </div>
 
             <UIcon
-              :name="activeOpen ? 'i-lucide-chevron-up' : 'i-lucide-chevron-down'"
+              :name="
+                activeOpen
+                  ? 'i-lucide-chevron-up'
+                  : 'i-lucide-chevron-down'
+              "
               class="h-5 w-5 text-slate-500"
             />
           </button>
 
           <div v-if="activeOpen" class="mt-6">
             <div v-if="activeBookings.length" class="space-y-4">
-              <UCard
+              <BookingCard
                 v-for="booking in activeBookings"
                 :key="booking.id"
-                variant="soft"
-              >
-                <div class="flex flex-col gap-5 md:flex-row">
-                  <img
-                    :src="booking.image"
-                    :alt="booking.title"
-                    class="h-44 w-full rounded-xl object-cover md:w-56"
-                  />
-
-                  <div class="flex flex-1 flex-col justify-between">
-                    <div>
-                      <div class="flex justify-between gap-4">
-                        <div>
-                          <h3 class="text-lg font-semibold">
-                            {{ booking.title }}
-                          </h3>
-                          <p class="text-sm text-slate-500">
-                            {{ booking.location }}
-                          </p>
-                        </div>
-
-                        <UBadge :color="statusColor(booking.status)" variant="soft">
-                          {{ booking.status }}
-                        </UBadge>
-                      </div>
-
-                      <div class="mt-4 grid grid-cols-2 gap-4 text-sm md:grid-cols-4">
-                        <div>
-                          <p class="text-slate-500">Check-in</p>
-                          <p class="font-medium">{{ booking.checkIn }}</p>
-                        </div>
-
-                        <div>
-                          <p class="text-slate-500">Check-out</p>
-                          <p class="font-medium">{{ booking.checkOut }}</p>
-                        </div>
-
-                        <div>
-                          <p class="text-slate-500">Nights</p>
-                          <p class="font-medium">{{ booking.nights }}</p>
-                        </div>
-
-                        <div>
-                          <p class="text-slate-500">Total</p>
-                          <p class="font-medium">€{{ booking.totalPrice }}</p>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div class="mt-5 flex flex-wrap gap-3">
-                      <UButton size="sm">View details</UButton>
-                      <UButton size="sm" color="neutral" variant="soft">
-                        Contact host
-                      </UButton>
-                      <UButton size="sm" color="error" variant="ghost">
-                        Cancel
-                      </UButton>
-                    </div>
-                  </div>
-                </div>
-              </UCard>
+                :booking="booking"
+                @view-listing="viewListing"
+                @review-request="reviewRequest"
+                @cancel="cancelBooking"
+              />
             </div>
 
-            <div v-else class="rounded-xl border border-dashed border-slate-300 py-10 text-center">
+            <div
+              v-else
+              class="rounded-xl border border-dashed border-slate-300 py-10 text-center"
+            >
               <p class="font-medium">No active bookings</p>
               <p class="mt-1 text-sm text-slate-500">
                 Your upcoming bookings will appear here.
@@ -153,17 +203,27 @@ function statusColor(status: BookingStatus) {
             </div>
 
             <UIcon
-              :name="favoritesOpen ? 'i-lucide-chevron-up' : 'i-lucide-chevron-down'"
+              :name="
+                favoritesOpen
+                  ? 'i-lucide-chevron-up'
+                  : 'i-lucide-chevron-down'
+              "
               class="h-5 w-5 text-slate-500"
             />
           </button>
 
           <div v-if="favoritesOpen" class="mt-6">
-            <div v-if="favorites.length" class="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <div
+              v-if="favorites.length"
+              class="grid grid-cols-1 gap-4 md:grid-cols-2"
+            >
               <!-- favorite cards later -->
             </div>
 
-            <div v-else class="rounded-xl border border-dashed border-slate-300 py-10 text-center">
+            <div
+              v-else
+              class="rounded-xl border border-dashed border-slate-300 py-10 text-center"
+            >
               <p class="font-medium">No favorites yet</p>
               <p class="mt-1 text-sm text-slate-500">
                 Saved apartments will appear here.
@@ -186,17 +246,31 @@ function statusColor(status: BookingStatus) {
             </div>
 
             <UIcon
-              :name="pastOpen ? 'i-lucide-chevron-up' : 'i-lucide-chevron-down'"
+              :name="
+                pastOpen
+                  ? 'i-lucide-chevron-up'
+                  : 'i-lucide-chevron-down'
+              "
               class="h-5 w-5 text-slate-500"
             />
           </button>
 
           <div v-if="pastOpen" class="mt-6">
             <div v-if="pastBookings.length" class="space-y-4">
-              <!-- past booking cards later -->
+              <BookingCard
+                v-for="booking in pastBookings"
+                :key="booking.id"
+                :booking="booking"
+                @view-listing="viewListing"
+                @review-request="reviewRequest"
+                @cancel="cancelBooking"
+              />
             </div>
 
-            <div v-else class="rounded-xl border border-dashed border-slate-300 py-10 text-center">
+            <div
+              v-else
+              class="rounded-xl border border-dashed border-slate-300 py-10 text-center"
+            >
               <p class="font-medium">No past bookings</p>
               <p class="mt-1 text-sm text-slate-500">
                 Completed bookings will appear here.

@@ -49,8 +49,16 @@ const toast = useToast()
 
 async function confirmBooking() {
   if (!listing.value || !dateRange.value.start || !dateRange.value.end) {
-    return
+    toast.add({
+      title: "Booking failed",
+      description: "Something went wrong. Please check your booking details.",
+      color: "error",
+    });
+
+    return;
   }
+
+  isSubmittingBooking.value = true;
 
   try {
     await $fetch(`${config.public.apiBase}/bookings`, {
@@ -79,24 +87,27 @@ async function confirmBooking() {
         billingAddress: paymentInfo.billingAddress,
         agreedToRules: paymentInfo.agreedToRules,
         agreedToCancellationPolicy: paymentInfo.agreedToCancellationPolicy,
-        confirmedInfoCorrect: paymentInfo.confirmedInfoCorrect
-      }
-    })
+        confirmedInfoCorrect: paymentInfo.confirmedInfoCorrect,
+      },
+    });
 
     toast.add({
-      title: "Booking confirmed",
-      description: "Your booking has been successfully created.",
-      color: "success"
-    })
+      title: "Booking request sent",
+      description: "Your booking is waiting for confirmation.",
+      color: "success",
+    });
 
+    await navigateTo("/bookings");
   } catch (error) {
-    console.error(error)
+    console.error(error);
 
     toast.add({
       title: "Booking failed",
-      description: "Unable to create booking.",
-      color: "error"
-    })
+      description: "Something went wrong. Please try again.",
+      color: "error",
+    });
+  } finally {
+    isSubmittingBooking.value = false;
   }
 }
 
@@ -306,14 +317,6 @@ function goToPayment() {
 
 onMounted(fetchListing);
 
-watchEffect(() => {
-  console.log("listing", listing.value);
-  console.log("unitOptions", unitOptions.value);
-  console.log("selectedUnit", selectedUnit.value);
-  console.log("selectedUnitData", selectedUnitData.value);
-  console.log("nightlyPrices", nightlyPrices.value);
-  console.log("totalPrice", totalPrice.value);
-});
 </script>
 
 <template>

@@ -1,8 +1,11 @@
 package hr.pocetnik.bookingapp.controller;
+
 import hr.pocetnik.bookingapp.dto.booking.BookingRequest;
 import hr.pocetnik.bookingapp.dto.booking.BookingResponse;
 import hr.pocetnik.bookingapp.exception.TokenNotFoundException;
 import hr.pocetnik.bookingapp.service.BookingService;
+
+import java.util.List;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,8 +24,7 @@ public class BookingController {
     @PostMapping
     public ResponseEntity<BookingResponse> createBooking(
             @CookieValue(name = "token", required = false) String token,
-            @RequestBody BookingRequest request
-    ) {
+            @RequestBody BookingRequest request) {
         if (token == null || token.isEmpty()) {
             throw new TokenNotFoundException();
         }
@@ -31,4 +33,28 @@ public class BookingController {
 
         return ResponseEntity.ok(response);
     }
+
+    @GetMapping("/me")
+    public ResponseEntity<List<BookingResponse>> getMyBookings(
+            @CookieValue(name = "token", required = false) String token) {
+        if (token == null || token.isEmpty()) {
+            throw new TokenNotFoundException();
+        }
+
+        return ResponseEntity.ok(bookingService.getMyBookings(token));
+    }
+
+    @PostMapping("/{id}/cancel")
+    public ResponseEntity<BookingResponse> cancelBooking(
+            @CookieValue(name = "token", required = false) String token,
+           @PathVariable("id") Long id) {
+        if (token == null || token.isEmpty()) {
+            throw new TokenNotFoundException();
+        }
+
+        BookingResponse response = bookingService.cancelBooking(token, id);
+
+        return ResponseEntity.ok(response);
+    }
+
 }

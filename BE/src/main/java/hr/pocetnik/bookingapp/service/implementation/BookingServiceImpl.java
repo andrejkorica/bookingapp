@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 
 @Service
 public class BookingServiceImpl implements BookingService {
@@ -109,7 +110,7 @@ public class BookingServiceImpl implements BookingService {
         booking.setAgreedToCancellationPolicy(request.getAgreedToCancellationPolicy());
         booking.setConfirmedInfoCorrect(request.getConfirmedInfoCorrect());
 
-        booking.setStatus(BookingStatus.CONFIRMED);
+        booking.setStatus(BookingStatus.PENDING);
 
         BookingEntity savedBooking = bookingRepository.save(booking);
 
@@ -166,7 +167,59 @@ public class BookingServiceImpl implements BookingService {
 
         response.setStatus(booking.getStatus());
         response.setCreatedAt(booking.getCreatedAt());
+        response.setListingLocation(booking.getListing().getLocation());
+        if (booking.getListing().getImages() != null &&
+                !booking.getListing().getImages().isEmpty()) {
+
+            response.setListingImage(
+                    booking.getListing().getImages().get(0));
+        }
 
         return response;
+    }
+
+    @Override
+    public List<BookingResponse> getMyBookings(String token) {
+
+        Claims claims = jwtService.extractAllClaims(token);
+        String email = claims.getSubject();
+
+        UserEntity guest = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException(email));
+
+        return bookingRepository
+                .findByGuestOrderByCreatedAtDesc(guest)
+                .stream()
+                .map(this::mapToResponse)
+                .toList();
+    }
+
+    @Override
+    public BookingResponse cancelBooking(String token, Long bookingId) {
+        Claims claims = jwtService.extractAllClaims(token);
+        String email = claims.getSubject();
+
+        BookingEntity booking = bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new RuntimeException("Booking not found."));
+
+        if (!booking.getGuest().getEmail().equals(email)) {
+            throw new RuntimeException("You can only cancel your own bookings.");
+        }
+
+        if (booking.getStatus() == BookingStatus.CANCELLED) {
+            throw new RuntimeException("Booking is already cancelled.");
+        }
+
+        LocalDate latestCancellationDate = booking.getCheckIn().minusDays(1);
+
+        if (!LocalDate.now().isBefore(latestCancellationDate)) {
+            throw new RuntimeException("Cancellation period is over.");
+        }
+
+        booking.setStatus(BookingStatus.CANCELLED);
+
+        BookingEntity savedBooking = bookingRepository.save(booking);
+
+        return mapToResponse(savedBooking);
     }
 }
