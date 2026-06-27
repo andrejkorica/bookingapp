@@ -34,5 +34,7 @@ public interface ListingService {
 
         List<ListingAvailableUnitResponse> getAvailableUnits(Long listingId);
 
+        List<String> getLocations();
+
         
 }

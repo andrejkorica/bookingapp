@@ -1,17 +1,62 @@
 <script setup lang="ts">
-import { DateFormatter, getLocalTimeZone, parseDate } from "@internationalized/date";
+import {
+  DateFormatter,
+  getLocalTimeZone,
+  parseDate,
+} from "@internationalized/date";
 import type { DateValue } from "@internationalized/date";
 import type { ListingSearchQuery } from "~/types/Search";
+import FilteringGuestSelector from "~/components/filtering/FilteringGuestSelector.vue";
 
 type DateRangeValue = {
   start: DateValue | undefined;
   end: DateValue | undefined;
 };
 
+const config = useRuntimeConfig();
+
 const destination = ref("");
 const checkIn = ref("");
 const checkOut = ref("");
-const occupancy = ref("");
+const isCalendarOpen = ref(false);
+
+const guestInfo = ref({
+  adults: 2,
+  children: 0,
+  rooms: 1,
+});
+
+const locationSuggestions = ref<string[]>([]);
+const isLoadingLocations = ref(false);
+
+const filteredLocationSuggestions = computed(() => {
+  if (!destination.value) {
+    return locationSuggestions.value.slice(0, 4);
+  }
+
+  return locationSuggestions.value
+    .filter((location) =>
+      location.toLowerCase().includes(destination.value.toLowerCase()),
+    )
+    .slice(0, 4);
+});
+
+async function fetchLocations() {
+  isLoadingLocations.value = true;
+
+  try {
+    locationSuggestions.value = await $fetch<string[]>(
+      `${config.public.apiBase}/listings/locations`,
+    );
+  } catch (error) {
+    console.error(error);
+    locationSuggestions.value = [];
+  } finally {
+    isLoadingLocations.value = false;
+  }
+}
+
+onMounted(fetchLocations);
 
 const tz = getLocalTimeZone();
 const df = new DateFormatter("en-US", {
@@ -55,7 +100,7 @@ function handleSearch() {
     destination: destination.value,
     checkIn: checkIn.value,
     checkOut: checkOut.value,
-    occupancy: occupancy.value,
+    occupancy: `${guestInfo.value.adults} adults · ${guestInfo.value.children} children · ${guestInfo.value.rooms} rooms`,
   });
 }
 </script>
@@ -85,8 +130,11 @@ function handleSearch() {
         >
           <div class="grid grid-cols-1 gap-3 md:grid-cols-10 md:items-center">
             <div class="md:col-span-3">
-              <UInput
+              <UInputMenu
                 v-model="destination"
+                :items="filteredLocationSuggestions"
+                :loading="isLoadingLocations"
+                open-on-focus
                 icon="i-heroicons-map-pin"
                 size="xl"
                 placeholder="Where are you going?"
@@ -95,17 +143,27 @@ function handleSearch() {
             </div>
 
             <div class="md:col-span-3">
-              <UPopover :content="{ align: 'start' }">
-                <UButton
-                  color="neutral"
-                  variant="subtle"
-                  icon="i-lucide-calendar"
+              <UPopover
+                v-model:open="isCalendarOpen"
+                :content="{ align: 'start' }"
+              >
+                <UInput
+                  :model-value="getDateLabel()"
+                  icon="i-heroicons-calendar-days"
                   size="xl"
-                  block
-                  class="justify-start"
-                >
-                  {{ getDateLabel() }}
-                </UButton>
+                  readonly
+                  class="w-full cursor-pointer"
+                  :ui="{
+                    leadingIcon: 'text-indigo-400',
+                    base: [
+                      'cursor-pointer text-left',
+                      !checkIn ? 'text-slate-500' : 'text-slate-900',
+                      isCalendarOpen
+                        ? 'ring-2 ring-indigo-500 border-indigo-500'
+                        : '',
+                    ],
+                  }"
+                />
 
                 <template #content>
                   <UCalendar
@@ -122,13 +180,7 @@ function handleSearch() {
             </div>
 
             <div class="md:col-span-3">
-              <UInput
-                v-model="occupancy"
-                icon="i-heroicons-user-group"
-                size="xl"
-                placeholder="2 adults · 0 children"
-                :ui="{ leadingIcon: 'text-indigo-400' }"
-              />
+              <FilteringGuestSelector v-model="guestInfo" />
             </div>
 
             <div class="md:col-span-1">

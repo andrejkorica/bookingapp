@@ -350,5 +350,9 @@ public class ListingServiceImpl implements ListingService {
                 .toList();
     }
 
+    @Override
+    public List<String> getLocations() {
+        return listingRepository.findDistinctLocations();
+    }
 
 }

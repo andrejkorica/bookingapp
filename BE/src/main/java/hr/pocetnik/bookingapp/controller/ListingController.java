@@ -49,6 +49,11 @@ public class ListingController {
         return listingService.getAllApprovedListings();
     }
 
+    @GetMapping("/listings/locations")
+    public ResponseEntity<List<String>> getLocations() {
+        return ResponseEntity.ok(listingService.getLocations());
+    }
+
     @GetMapping("/listings/{id}")
     public ListingResponse getListingById(
             @PathVariable("id") Long id) {
@@ -81,7 +86,4 @@ public class ListingController {
         return listingService.getAvailableUnits(listingId);
     }
 
-
-
-    
 }
