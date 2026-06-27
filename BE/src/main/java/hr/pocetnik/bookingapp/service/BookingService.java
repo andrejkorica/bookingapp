@@ -3,6 +3,7 @@ package hr.pocetnik.bookingapp.service;
 import java.util.List;
 
 import hr.pocetnik.bookingapp.dto.booking.BookingDetailsResponse;
+import hr.pocetnik.bookingapp.dto.booking.BookingRangeResponse;
 import hr.pocetnik.bookingapp.dto.booking.BookingRequest;
 import hr.pocetnik.bookingapp.dto.booking.BookingResponse;
 
@@ -21,5 +22,7 @@ public interface BookingService {
     BookingResponse approveBooking(String token, Long bookingId);
 
     BookingResponse rejectBooking(String token, Long bookingId);
+
+    List<BookingRangeResponse> getBookedRanges(Long listingId);
 
 }

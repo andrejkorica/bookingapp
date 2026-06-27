@@ -129,6 +129,11 @@ const statusColor = computed(() => {
             variant="soft"
             size="sm"
             :disabled="booking.status !== 'PENDING'"
+            :class="
+              booking.status === 'PENDING'
+                ? 'hover:bg-green-600 hover:text-white transition-colors'
+                : 'bg-slate-200 text-slate-500 cursor-not-allowed'
+            "
             @click="emit('approve', booking.id)"
           />
 
@@ -139,8 +144,14 @@ const statusColor = computed(() => {
             variant="ghost"
             size="sm"
             :disabled="booking.status !== 'PENDING'"
+            :class="
+              booking.status === 'PENDING'
+                ? 'hover:bg-red-600 hover:text-white transition-colors'
+                : 'bg-slate-200 text-slate-500 cursor-not-allowed'
+            "
             @click="emit('reject', booking.id)"
           />
+          
         </div>
       </div>
     </div>

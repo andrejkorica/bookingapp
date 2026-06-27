@@ -70,9 +70,7 @@
               class="mb-6"
             />
 
-            <h3 class="mb-4 text-xl font-bold">
-              Amenities
-            </h3>
+            <h3 class="mb-4 text-xl font-bold">Amenities</h3>
 
             <ul
               v-if="listingData.amenities?.length"
@@ -91,9 +89,7 @@
               </li>
             </ul>
 
-            <p v-else class="text-slate-500">
-              No amenities listed.
-            </p>
+            <p v-else class="text-slate-500">No amenities listed.</p>
 
             <div
               v-if="isLoadingAvailableUnits"
@@ -113,9 +109,7 @@
           <div>
             <UCard class="border border-slate-200 bg-white shadow-lg">
               <div class="space-y-4 text-center">
-                <p class="text-lg text-slate-500">
-                  Price per night
-                </p>
+                <p class="text-lg text-slate-500">Price per night</p>
 
                 <p class="text-4xl font-bold text-slate-900">
                   {{ priceLabel }}
@@ -126,9 +120,17 @@
                   size="xl"
                   block
                   class="bg-indigo-600 font-bold text-white hover:bg-indigo-700"
-                  :disabled="!authStore.user || isOwner || !isAvailableForBooking"
+                  :disabled="
+                    !authStore.user ||
+                    isOwner ||
+                    !isAvailableForBooking ||
+                    !hasAvailableUnits
+                  "
                   :to="
-                    authStore.user && !isOwner && isAvailableForBooking
+                    authStore.user &&
+                    !isOwner &&
+                    isAvailableForBooking &&
+                    hasAvailableUnits
                       ? `/bookings/create?listingId=${listingData.id}`
                       : undefined
                   "
@@ -140,6 +142,12 @@
 
                 <p v-else-if="isOwner" class="text-sm text-slate-500">
                   You cannot book your own listing.
+                </p>
+                <p
+                  v-else-if="!hasAvailableUnits"
+                  class="text-sm text-slate-500"
+                >
+                  No units are currently available for booking.
                 </p>
 
                 <p
@@ -226,6 +234,17 @@ const previewImages = computed(() => {
   );
 });
 
+const hasAvailableUnits = computed(() => {
+  return availableUnits.value.some((unit) => {
+    const quantity =
+      unit.availableQuantity !== undefined
+        ? unit.availableQuantity
+        : unit.quantity;
+
+    return quantity > 0;
+  });
+});
+
 const isAvailableForBooking = computed(() => {
   if (!listingData.value?.availableFrom) {
     return true;
@@ -269,7 +288,7 @@ async function fetchAvailableUnits(listingId: number) {
 
   try {
     availableUnits.value = await $fetch<ListingUnit[]>(
-      `${config.public.apiBase}/listings/${listingId}/available-units`
+      `${config.public.apiBase}/listings/${listingId}/available-units`,
     );
   } catch (error) {
     console.error(error);
@@ -285,7 +304,7 @@ async function fetchListing() {
 
   try {
     listingData.value = await $fetch<Listing>(
-      `${config.public.apiBase}/listings/${route.params.id}`
+      `${config.public.apiBase}/listings/${route.params.id}`,
     );
 
     await fetchAvailableUnits(listingData.value.id);

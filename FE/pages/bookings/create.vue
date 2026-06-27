@@ -7,6 +7,7 @@ import BookingDateSelector from "~/components/booking/BookingDateSelector.vue";
 import BookingPriceSummary from "~/components/booking/BookingPriceSummary.vue";
 import BookingGuestInfo from "~/components/booking/BookingGuestInfo.vue";
 import BookingPaymentForm from "~/components/booking/BookingPaymentForm.vue";
+import type { BookedRange } from "~/types/BookingTypes";
 
 definePageMeta({
   layout: "default",
@@ -55,6 +56,7 @@ const availableUnits = ref<ListingUnit[]>([]);
 const isLoading = ref(false);
 const isLoadingAvailableUnits = ref(false);
 const isSubmittingBooking = ref(false);
+const bookedRanges = ref<BookedRange[]>([]);
 
 const selectedUnits = ref<Record<string, number>>({});
 
@@ -89,6 +91,27 @@ const paymentInfo = reactive({
   confirmedInfoCorrect: false,
 });
 
+async function fetchBookedRanges(listingId: number) {
+  try {
+    bookedRanges.value = await $fetch<BookedRange[]>(
+      `${config.public.apiBase}/bookings/${listingId}/booked-ranges`,
+      {
+        credentials: "include",
+      },
+    );
+  } catch (error) {
+    console.error(error);
+
+    toast.add({
+      title: "Booked dates failed",
+      description: "Could not load unavailable dates.",
+      color: "error",
+    });
+
+    bookedRanges.value = [];
+  }
+}
+
 const availableFromDate = computed(() => {
   if (!listing.value?.availableFrom) {
     return undefined;
@@ -100,7 +123,7 @@ const availableFromDate = computed(() => {
 const unitOptions = computed(() => {
   const sourceUnits = availableUnits.value.length
     ? availableUnits.value
-    : listing.value?.units ?? [];
+    : (listing.value?.units ?? []);
 
   return sourceUnits
     .filter((unit) => {
@@ -277,7 +300,10 @@ async function fetchListing() {
       },
     );
 
-    await fetchAvailableUnits(listing.value.id);
+    await Promise.all([
+      fetchAvailableUnits(listing.value.id),
+      fetchBookedRanges(listing.value.id),
+    ]);
   } catch (error) {
     console.error(error);
   } finally {
@@ -412,6 +438,7 @@ onMounted(fetchListing);
             <BookingDateSelector
               v-model="dateRange"
               :min-date="availableFromDate || undefined"
+              :booked-ranges="bookedRanges"
             />
           </div>
 

@@ -1,5 +1,6 @@
 package hr.pocetnik.bookingapp.service.implementation;
 
+import hr.pocetnik.bookingapp.dto.booking.BookingRangeResponse;
 import hr.pocetnik.bookingapp.dto.listing.ListingAvailableUnitResponse;
 import hr.pocetnik.bookingapp.dto.listing.ListingRequest;
 import hr.pocetnik.bookingapp.dto.listing.ListingResponse;
@@ -348,4 +349,6 @@ public class ListingServiceImpl implements ListingService {
                 })
                 .toList();
     }
+
+
 }

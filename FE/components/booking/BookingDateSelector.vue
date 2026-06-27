@@ -1,10 +1,15 @@
 <script setup lang="ts">
 import type { DateValue } from '@internationalized/date'
-import { today, getLocalTimeZone } from '@internationalized/date'
+import { today, getLocalTimeZone, parseDate } from '@internationalized/date'
 
 type DateRangeValue = {
   start: DateValue | undefined
   end: DateValue | undefined
+}
+
+type BookedRange = {
+  checkIn: string
+  checkOut: string
 }
 
 const dateRange = defineModel<DateRangeValue>({
@@ -12,13 +17,27 @@ const dateRange = defineModel<DateRangeValue>({
 })
 
 const props = defineProps<{
-  minDate?: DateValue | undefined
+  minDate?: DateValue
+  bookedRanges?: BookedRange[]
 }>()
 
-const minDate = today(getLocalTimeZone())
+const fallbackMinDate = today(getLocalTimeZone())
 
 const isDateUnavailable = (date: DateValue) => {
-  return date.compare(minDate) < 0
+  const min = props.minDate ?? fallbackMinDate
+
+  if (date.compare(min) < 0) {
+    return true
+  }
+
+  return (
+    props.bookedRanges?.some((range) => {
+      const checkIn = parseDate(range.checkIn)
+      const checkOut = parseDate(range.checkOut)
+
+      return date.compare(checkIn) >= 0 && date.compare(checkOut) < 0
+    }) ?? false
+  )
 }
 </script>
 

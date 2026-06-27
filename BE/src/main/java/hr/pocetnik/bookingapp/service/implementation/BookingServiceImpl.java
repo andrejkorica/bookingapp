@@ -13,6 +13,7 @@ import hr.pocetnik.bookingapp.service.JwtService;
 import io.jsonwebtoken.Claims;
 import org.springframework.stereotype.Service;
 import hr.pocetnik.bookingapp.dto.booking.BookingDetailsResponse;
+import hr.pocetnik.bookingapp.dto.booking.BookingRangeResponse;
 import hr.pocetnik.bookingapp.dto.booking.BookingUnitResponse;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -417,5 +418,10 @@ public class BookingServiceImpl implements BookingService {
         }
 
         return booking;
+    }
+
+    @Override
+    public List<BookingRangeResponse> getBookedRanges(Long listingId) {
+        return bookingRepository.findBookedRangesByListingId(listingId);
     }
 }

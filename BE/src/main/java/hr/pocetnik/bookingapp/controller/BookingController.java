@@ -1,6 +1,7 @@
 package hr.pocetnik.bookingapp.controller;
 
 import hr.pocetnik.bookingapp.dto.booking.BookingDetailsResponse;
+import hr.pocetnik.bookingapp.dto.booking.BookingRangeResponse;
 import hr.pocetnik.bookingapp.dto.booking.BookingRequest;
 import hr.pocetnik.bookingapp.dto.booking.BookingResponse;
 import hr.pocetnik.bookingapp.exception.TokenNotFoundException;
@@ -88,6 +89,12 @@ public class BookingController {
             @PathVariable Long bookingId) {
 
         return bookingService.rejectBooking(token, bookingId);
+    }
+    
+        @GetMapping("/{listingId}/booked-ranges")
+    public ResponseEntity<List<BookingRangeResponse>> getBookedRanges(
+            @PathVariable Long listingId) {
+        return ResponseEntity.ok(bookingService.getBookedRanges(listingId));
     }
 
 }

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { DateValue } from "@internationalized/date";
 import { parseDate, today, getLocalTimeZone } from "@internationalized/date";
-import { unitTypes } from "~/utils/unitTypes";
+import { unitTypes } from "~/types/unitTypes.js";
 import CreateListingUnits, {
   type ListingUnit,
 } from "../../../../components/listings/CreateListingUnits.vue";
