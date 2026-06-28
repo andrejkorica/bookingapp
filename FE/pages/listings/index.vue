@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import FilteringSearchBar from "~/components/filtering/FilteringSearchBar.vue";
-import FilteringSidebar from "~/components/filtering/FilteringSidebar.vue";
+import FilteringSidebar from "~/components/filtering/filterBar/FilteringSidebar.vue";
 import ListingCard from "~/components/listings/listingCard.vue";
 import FilteringSortDropdown from "~/components/filtering/FilteringSortDropdown.vue";
 

@@ -1,4 +1,6 @@
 package hr.pocetnik.bookingapp.dto.listing;
+
+import hr.pocetnik.bookingapp.enums.ListingStatus;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -6,8 +8,6 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-
-import hr.pocetnik.bookingapp.enums.ListingStatus;
 
 @Getter
 @Setter
@@ -21,7 +21,11 @@ public class ListingResponse {
 
     private String description;
 
-    private Integer rating;
+    private Integer rating; 
+
+    private Double averageRating;
+
+    private Long reviewCount;
 
     private BigDecimal lowestPrice;
 

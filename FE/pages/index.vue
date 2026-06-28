@@ -1,35 +1,13 @@
-
-
 <script setup lang="ts">
+import ListingCard from "~/components/listings/ListingCard.vue";
+import FilteringSearchBar from "~/components/filtering/FilteringSearchBar.vue";
+import type { Listing } from "~/types/ListingTypes";
+
 definePageMeta({
   layout: "default",
 });
 
-import listingCard from "../components/listings/listingCard.vue";
-import FilteringSearchBar from "~/components/filtering/FilteringSearchBar.vue";
-
-type Listing = {
-  id: number;
-  title: string;
-  location: string;
-  description: string;
-  lowestPrice: number;
-  highestPrice: number;
-  rating: number;
-  images: string[];
-  amenities: string[];
-  status: string;
-  sellerEmail: string;
-  createdAt: string;
-};
-
 const config = useRuntimeConfig();
-
-const searchQuery = reactive({
-  destination: "",
-  dates: "",
-  occupancy: "",
-});
 
 const listings = ref<Listing[]>([]);
 const isLoading = ref(false);
@@ -43,13 +21,10 @@ async function fetchListings() {
     );
   } catch (error) {
     console.error(error);
+    listings.value = [];
   } finally {
     isLoading.value = false;
   }
-}
-
-function handleSearch() {
-  console.log("Searching with:", searchQuery);
 }
 
 onMounted(fetchListings);
@@ -57,11 +32,9 @@ onMounted(fetchListings);
 
 <template>
   <div class="min-h-screen bg-slate-100 text-slate-900">
-    <FilteringSearchBar
-      @search="handleSearch"
-    />
+    <FilteringSearchBar />
 
-    <main class="container mx-auto px-4 sm:px-6 lg:px-8 pt-10">
+    <main class="container mx-auto px-4 pt-10 sm:px-6 lg:px-8">
       <section class="pb-12">
         <div v-if="isLoading" class="py-12 text-center text-slate-500">
           Loading listings...
@@ -74,8 +47,8 @@ onMounted(fetchListings);
           No listings found.
         </div>
 
-        <div v-else class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <listingCard
+        <div v-else class="grid grid-cols-1 gap-8 lg:grid-cols-2">
+          <ListingCard
             v-for="listing in listings"
             :key="listing.id"
             :listing="listing"

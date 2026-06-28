@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import ListingReviewCard from "~/components/listings/ListingReviewCard.vue";
+import ListingReviewCard from "~/components/listings/reviews/ListingReviewCard.vue";
 import type { ListingReview } from "~/types/ReviewTypes";
 
 const props = defineProps<{

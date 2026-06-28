@@ -4,13 +4,13 @@ import { today, getLocalTimeZone } from "@internationalized/date";
 import { unitTypes } from "~/types/UnitTypes.js";
 import CreateListingUnits, {
   type ListingUnit,
-} from "../../../components/listings/CreateListingUnits.vue";
-import CreateListingAvailability from "../../../components/listings/CreateListingAvailability.vue";
+} from "../../../components/listings/create/CreateListingUnits.vue";
+import CreateListingAvailability from "../../../components/listings/create/CreateListingAvailability.vue";
 import CreateListingPriceAdjustments, {
   type PriceAdjustment,
-} from "../../../components/listings/CreateListingPriceAdjustments.vue";
-import CreateListingLocation from "../../../components/listings/CreateListingLocation.vue";
-import CreateListingImagePreview from "../../../components/listings/CreateListingImagePreview.vue";
+} from "../../../components/listings/create/CreateListingPriceAdjustments.vue";
+import CreateListingLocation from "../../../components/listings/create/CreateListingLocation.vue";
+import CreateListingImagePreview from "../../../components/listings/create/CreateListingImagePreview.vue";
 
 definePageMeta({
   layout: "default",

@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import FilteringAmenities from "~/components/filtering/FilteringAmenities.vue";
-import FilteringPriceRange from "~/components/filtering/FilteringPriceRange.vue";
-import FilteringRating from "~/components/filtering/FilteringRating.vue";
+import FilteringAmenities from "~/components/filtering/filterBar/FilteringAmenities.vue";
+import FilteringPriceRange from "~/components/filtering/filterBar/FilteringPriceRange.vue";
+import FilteringRating from "~/components/filtering/filterBar/FilteringRating.vue";
 
 const rating = ref<number | null>(null);
 

@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { useAuthStore } from "~/stores/auth";
-import CreateListingImagePreview from "~/components/listings/CreateListingImagePreview.vue";
+import CreateListingImagePreview from "~/components/listings/create/CreateListingImagePreview.vue";
 import ListingLocationMap from "~/components/listings/ListingLocationMap.vue";
 import ListingAvailableUnits from "~/components/listings/ListingAvailableUnits.vue";
-import ListingReviews from "~/components/listings/ListingReviews.vue";
+import ListingReviews from "~/components/listings/reviews/ListingReviews.vue";
 import type { ListingReview } from "~/types/ReviewTypes";
 import type { Listing, ListingUnit } from "~/types/ListingTypes";
 

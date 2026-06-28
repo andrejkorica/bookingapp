@@ -1,6 +1,5 @@
 package hr.pocetnik.bookingapp.service.implementation;
 
-import hr.pocetnik.bookingapp.dto.booking.BookingRangeResponse;
 import hr.pocetnik.bookingapp.dto.listing.ListingAvailableUnitResponse;
 import hr.pocetnik.bookingapp.dto.listing.ListingRequest;
 import hr.pocetnik.bookingapp.dto.listing.ListingResponse;
@@ -16,12 +15,12 @@ import hr.pocetnik.bookingapp.model.ListingUnitEntity;
 import hr.pocetnik.bookingapp.model.UserEntity;
 import hr.pocetnik.bookingapp.repository.BookingRepository;
 import hr.pocetnik.bookingapp.repository.ListingRepository;
+import hr.pocetnik.bookingapp.repository.ReviewRepository;
 import hr.pocetnik.bookingapp.repository.UserRepository;
 import hr.pocetnik.bookingapp.service.ListingService;
 
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -34,14 +33,17 @@ public class ListingServiceImpl implements ListingService {
     private final ListingRepository listingRepository;
     private final UserRepository userRepository;
     private final BookingRepository bookingRepository;
+    private final ReviewRepository reviewRepository;
 
     public ListingServiceImpl(
             ListingRepository listingRepository,
             UserRepository userRepository,
-            BookingRepository bookingRepository) {
+            BookingRepository bookingRepository,
+            ReviewRepository reviewRepository) {
         this.listingRepository = listingRepository;
         this.userRepository = userRepository;
         this.bookingRepository = bookingRepository;
+        this.reviewRepository = reviewRepository;
     }
 
     @Override
@@ -247,11 +249,15 @@ public class ListingServiceImpl implements ListingService {
             ListingEntity listing) {
 
         ListingResponse response = new ListingResponse();
+        Long reviewCount = reviewRepository.countByListingId(listing.getId());
+        Double averageRating = reviewRepository.findAverageRatingByListingId(listing.getId());
 
         response.setId(listing.getId());
         response.setTitle(listing.getTitle());
         response.setLocation(listing.getLocation());
         response.setDescription(listing.getDescription());
+        response.setReviewCount(reviewCount);
+        response.setAverageRating(averageRating != null ? averageRating : 0.0);
         response.setRating(listing.getRating());
         response.setImages(listing.getImages());
         response.setAmenities(listing.getAmenities());
