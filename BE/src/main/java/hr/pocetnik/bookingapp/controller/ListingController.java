@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -41,12 +42,7 @@ public class ListingController {
         return listingService.getMyListings(
                 email);
     }
-
-    @GetMapping("/listings")
-    public List<ListingResponse> getAllApprovedListings() {
-        return listingService.getAllApprovedListings();
-    }
-
+    
     @GetMapping("/listings/locations")
     public ResponseEntity<List<String>> getLocations() {
         return ResponseEntity.ok(listingService.getLocations());
@@ -82,6 +78,34 @@ public class ListingController {
             @PathVariable Long listingId) {
 
         return listingService.getAvailableUnits(listingId);
+    }
+
+    @GetMapping("/listings")
+    public List<ListingResponse> getAllApprovedListings(
+            @RequestParam(required = false) String location,
+            @RequestParam(required = false) LocalDate checkIn,
+            @RequestParam(required = false) LocalDate checkOut,
+            @RequestParam(required = false) Integer adults,
+            @RequestParam(required = false) Integer children,
+            @RequestParam(required = false) Integer rooms) {
+        boolean hasFilters = location != null ||
+                checkIn != null ||
+                checkOut != null ||
+                adults != null ||
+                children != null ||
+                rooms != null;
+
+        if (hasFilters) {
+            return listingService.searchListings(
+                    location,
+                    checkIn,
+                    checkOut,
+                    adults,
+                    children,
+                    rooms);
+        }
+
+        return listingService.getAllApprovedListings();
     }
 
 }

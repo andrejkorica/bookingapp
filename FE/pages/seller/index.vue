@@ -1,111 +1,94 @@
 <script setup lang="ts">
-import { useAuthStore } from '~/stores/auth'
+import ListingCard from "~/components/listings/ListingCard.vue";
+import FilteringSearchBar from "~/components/filtering/FilteringSearchBar.vue";
+import FilteringSidebar from "~/components/filtering/filterBar/FilteringSidebar.vue";
+import type { Listing } from "~/types/ListingTypes";
 
 definePageMeta({
-  layout: 'default',
-  middleware: 'seller-guard'
-})
+  layout: "default",
+});
 
-const authStore = useAuthStore()
+const config = useRuntimeConfig();
+const route = useRoute();
 
-const actionCardUi = {
-  root: 'flex h-full flex-col',
-  body: 'flex-1',
-  footer: 'shrink-0'
+const listings = ref<Listing[]>([]);
+const isLoading = ref(false);
+
+async function fetchListings() {
+  isLoading.value = true;
+
+  try {
+    listings.value = await $fetch<Listing[]>(
+      `${config.public.apiBase}/listings`,
+      {
+        query: {
+          location: route.query.location || undefined,
+          checkIn: route.query.checkIn || undefined,
+          checkOut: route.query.checkOut || undefined,
+          adults: route.query.adults || undefined,
+          children: route.query.children || undefined,
+          rooms: route.query.rooms || undefined,
+        },
+      },
+    );
+  } catch (error) {
+    console.error(error);
+    listings.value = [];
+  } finally {
+    isLoading.value = false;
+  }
 }
+
+watch(
+  () => route.query,
+  () => fetchListings(),
+  { immediate: true },
+);
 </script>
 
 <template>
-  <div class="min-h-screen bg-slate-50">
-    <div class="container mx-auto px-4 py-10">
-      <div class="mb-8">
-        <h1 class="text-3xl font-bold text-slate-900">
-          Seller Dashboard
-        </h1>
+  <div class="min-h-screen bg-slate-100 text-slate-900">
+    <FilteringSearchBar />
 
-        <p class="mt-2 text-slate-600">
-          Welcome back, {{ authStore.user?.name }}. Manage your listings and track your seller activity.
-        </p>
-      </div>
+    <main class="mx-auto max-w-7xl px-4 pt-10 sm:px-6 lg:px-8">
+      <div class="flex items-start gap-6">
+        <aside class="w-[280px] shrink-0">
+          <FilteringSidebar />
+        </aside>
 
-      <div class="mb-8 grid gap-6 md:grid-cols-3">
-        <UCard>
-          <div class="flex items-center justify-between">
+        <section class="min-w-0 flex-1 pb-12">
+          <div class="mb-4 flex items-center justify-between gap-4">
             <div>
-              <p class="text-sm text-slate-500">Total Earnings</p>
-              <p class="mt-2 text-3xl font-bold text-slate-900">€0.00</p>
+              <h1 class="text-2xl font-bold text-slate-900">
+                Search results
+              </h1>
+
+              <p class="mt-1 text-sm text-slate-500">
+                {{ listings.length }} properties found
+              </p>
             </div>
-
-            <UIcon name="i-lucide-euro" class="size-8 text-slate-400" />
           </div>
-        </UCard>
 
-        <UCard>
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-sm text-slate-500">Total Listings</p>
-              <p class="mt-2 text-3xl font-bold text-slate-900">0</p>
-            </div>
-
-            <UIcon name="i-lucide-building-2" class="size-8 text-slate-400" />
+          <div v-if="isLoading" class="py-12 text-center text-slate-500">
+            Loading listings...
           </div>
-        </UCard>
 
-        <UCard>
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-sm text-slate-500">Active Bookings</p>
-              <p class="mt-2 text-3xl font-bold text-slate-900">0</p>
-            </div>
-
-            <UIcon name="i-lucide-calendar-check" class="size-8 text-slate-400" />
+          <div
+            v-else-if="listings.length === 0"
+            class="rounded-xl border border-slate-200 bg-white py-12 text-center text-slate-500"
+          >
+            No listings found.
           </div>
-        </UCard>
-      </div>
 
-      <div class="grid items-stretch gap-6 md:grid-cols-2">
-        <UCard :ui="actionCardUi">
-          <template #header>
-            <h2 class="font-semibold">Create Listing</h2>
-          </template>
-
-          <p class="text-sm text-slate-600">
-            Add a new apartment, room, or property to your seller account.
-          </p>
-
-          <template #footer>
-            <UButton
-              label="Create Listing"
-              icon="i-lucide-plus"
-              variant="soft"
-              color="neutral"
-              to="/seller/listings/create"
+          <div v-else class="space-y-5">
+            <ListingCard
+              v-for="listing in listings"
+              :key="listing.id"
+              :listing="listing"
             />
-          </template>
-        </UCard>
-
-        <UCard :ui="actionCardUi">
-          <template #header>
-            <h2 class="font-semibold">Manage Listings</h2>
-          </template>
-
-          <p class="text-sm text-slate-600">
-            Edit listing details, update pricing, manage availability, and temporarily disable bookings during renovations or maintenance.
-          </p>
-
-          <template #footer>
-            <UButton
-              label="Manage Listings"
-              icon="i-lucide-settings"
-              variant="soft"
-              color="neutral"
-              to="/seller/listings/manage"
-            />
-          </template>
-        </UCard>
-
-
+          </div>
+        </section>
       </div>
-    </div>
+    </main>
   </div>
 </template>

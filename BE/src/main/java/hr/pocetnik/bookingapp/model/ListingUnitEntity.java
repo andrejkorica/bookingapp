@@ -19,6 +19,8 @@ public class ListingUnitEntity {
 
     private String label;
 
+    private Integer roomCount;
+
     private Integer quantity;
 
     private BigDecimal pricePerNight;

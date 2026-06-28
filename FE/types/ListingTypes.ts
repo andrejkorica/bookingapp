@@ -6,6 +6,7 @@ export type ListingUnit = {
   availableQuantity?: number;
   maxGuests?: number;
   pricePerNight: number;
+  roomCount: number;
 };
 
 export type Listing = {
@@ -33,3 +34,9 @@ export type Listing = {
   sellerEmail: string;
   createdAt: string;
 };
+
+export type PriceAdjustment = {
+  startDate: string
+  endDate: string
+  percent: number
+}

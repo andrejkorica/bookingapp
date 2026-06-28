@@ -13,8 +13,10 @@ type DateRangeValue = {
 };
 
 const config = useRuntimeConfig();
+const router = useRouter();
 
 const destination = ref("");
+const destinationSearch = ref("");
 const checkIn = ref("");
 const checkOut = ref("");
 const isCalendarOpen = ref(false);
@@ -29,15 +31,15 @@ const locationSuggestions = ref<string[]>([]);
 const isLoadingLocations = ref(false);
 
 const filteredLocationSuggestions = computed(() => {
-  if (!destination.value) {
+  const query = destinationSearch.value.trim().toLowerCase();
+
+  if (!query) {
     return locationSuggestions.value.slice(0, 4);
   }
 
-  return locationSuggestions.value
-    .filter((location) =>
-      location.toLowerCase().includes(destination.value.toLowerCase()),
-    )
-    .slice(0, 4);
+  return locationSuggestions.value.filter((location) =>
+    location.toLowerCase().includes(query),
+  );
 });
 
 async function fetchLocations() {
@@ -90,8 +92,10 @@ function getDateLabel() {
   return `${df.format(start.toDate(tz))} - ${df.format(end.toDate(tz))}`;
 }
 
-
-const router = useRouter();
+function clearDestination() {
+  destination.value = "";
+  destinationSearch.value = "";
+}
 
 function handleSearch() {
   router.push({
@@ -132,17 +136,32 @@ function handleSearch() {
           class="rounded-2xl border border-slate-100 bg-white p-4 shadow-2xl"
         >
           <div class="grid grid-cols-1 gap-3 md:grid-cols-10 md:items-center">
-            <div class="md:col-span-3">
+            <div class="relative md:col-span-3">
               <UInputMenu
                 v-model="destination"
+                v-model:search-term="destinationSearch"
                 :items="filteredLocationSuggestions"
                 :loading="isLoadingLocations"
                 open-on-focus
+                ignore-filter
                 icon="i-heroicons-map-pin"
                 size="xl"
                 placeholder="Where are you going?"
-                :ui="{ leadingIcon: 'text-indigo-400' }"
+                class="w-full"
+                :ui="{
+                  leadingIcon: 'text-indigo-400',
+                  base: destination ? 'pr-16' : '',
+                }"
               />
+
+              <button
+                v-if="destination"
+                type="button"
+                class="absolute right-9 top-1/2 z-10 flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded-full text-slate-400 transition hover:bg-slate-100 hover:text-slate-600"
+                @click.stop="clearDestination"
+              >
+                <UIcon name="i-heroicons-x-mark-20-solid" class="h-4 w-4" />
+              </button>
             </div>
 
             <div class="md:col-span-3">
@@ -174,9 +193,7 @@ function handleSearch() {
                     class="p-2"
                     :number-of-months="2"
                     range
-                    @update:model-value="
-                      setDateRange($event as DateRangeValue)
-                    "
+                    @update:model-value="setDateRange($event as DateRangeValue)"
                   />
                 </template>
               </UPopover>

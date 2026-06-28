@@ -1,16 +1,13 @@
 <script setup lang="ts">
 import type { DateValue } from "@internationalized/date";
 import { today, getLocalTimeZone } from "@internationalized/date";
-import { unitTypes } from "~/types/UnitTypes.js";
-import CreateListingUnits, {
-  type ListingUnit,
-} from "../../../components/listings/create/CreateListingUnits.vue";
+import { unitTypes } from "~/constants/UnitConstants.js";
+import CreateListingUnits from "../../../components/listings/create/CreateListingUnits.vue";
 import CreateListingAvailability from "../../../components/listings/create/CreateListingAvailability.vue";
-import CreateListingPriceAdjustments, {
-  type PriceAdjustment,
-} from "../../../components/listings/create/CreateListingPriceAdjustments.vue";
+import type { PriceAdjustment } from "~/types/ListingTypes.js";
 import CreateListingLocation from "../../../components/listings/create/CreateListingLocation.vue";
 import CreateListingImagePreview from "../../../components/listings/create/CreateListingImagePreview.vue";
+import type { ListingUnit } from "~/types/ListingTypes.js";
 
 definePageMeta({
   layout: "default",
@@ -48,6 +45,7 @@ const listingUnits = ref<ListingUnit[]>(
     label: unit.label,
     quantity: 0,
     maxGuests: unit.maxGuests,
+    roomCount: unit.roomCount,
     pricePerNight: 0,
   })),
 );
@@ -61,9 +59,6 @@ const priceAdjustments = ref<PriceAdjustment[]>([
     percent: 0,
   },
 ]);
-const previewImages = computed(() =>
-  images.value.map((image) => image.previewUrl),
-);
 
 const selectedUnits = computed(() =>
   listingUnits.value.filter(
@@ -177,6 +172,7 @@ async function createListing() {
           type: unit.type,
           label: unit.label,
           quantity: Number(unit.quantity),
+          roomCount: Number(unit.roomCount),
           maxGuests: Number(unit.maxGuests),
           pricePerNight: Number(unit.pricePerNight),
         })),

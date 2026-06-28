@@ -17,6 +17,8 @@ public class ListingUnitResponse {
 
     private Integer quantity;
 
+    private Integer roomCount;
+
     private BigDecimal pricePerNight;
 
     private Integer maxGuests;

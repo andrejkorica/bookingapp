@@ -2,12 +2,7 @@
 import { breakpointsTailwind, useBreakpoints } from '@vueuse/core'
 import { DateFormatter, getLocalTimeZone, parseDate } from '@internationalized/date'
 import type { DateValue } from '@internationalized/date'
-
-export type PriceAdjustment = {
-  startDate: string
-  endDate: string
-  percent: number
-}
+import type { PriceAdjustment } from "~/types/ListingTypes"
 
 type DateRangeValue = {
   start: DateValue | undefined

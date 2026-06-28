@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import CreateListingImagePreview from "../../../components/listings/CreateListingImagePreview.vue";
+import CreateListingImagePreview from "~/components/listings/create/CreateListingImagePreview.vue";
 import ListingLocationMap from "../../../components/listings/ListingLocationMap.vue";
 import ListingAvailableUnits from "../../../components/listings/ListingAvailableUnits.vue";
 

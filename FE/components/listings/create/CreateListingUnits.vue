@@ -1,11 +1,5 @@
 <script setup lang="ts">
-export type ListingUnit = {
-  type: string
-  label: string
-  quantity: number
-  maxGuests: number
-  pricePerNight: number
-}
+import type { ListingUnit } from '~/types/ListingTypes'
 
 const listingUnits = defineModel<ListingUnit[]>({
   required: true

@@ -21,6 +21,7 @@ import hr.pocetnik.bookingapp.service.ListingService;
 
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -214,6 +215,7 @@ public class ListingServiceImpl implements ListingService {
                     unit.setLabel(unitRequest.getLabel());
                     unit.setQuantity(unitRequest.getQuantity());
                     unit.setPricePerNight(unitRequest.getPricePerNight());
+                    unit.setRoomCount(unitRequest.getRoomCount());
                     unit.setListing(listing);
                     unit.setMaxGuests(unitRequest.getMaxGuests());
 
@@ -245,71 +247,50 @@ public class ListingServiceImpl implements ListingService {
                 .collect(Collectors.toList());
     }
 
-    private ListingResponse mapToResponse(
-            ListingEntity listing) {
+    @Override
+    public List<ListingResponse> searchListings(
+            String location,
+            LocalDate checkIn,
+            LocalDate checkOut,
+            Integer adults,
+            Integer children,
+            Integer rooms) {
 
-        ListingResponse response = new ListingResponse();
-        Long reviewCount = reviewRepository.countByListingId(listing.getId());
-        Double averageRating = reviewRepository.findAverageRatingByListingId(listing.getId());
+        Integer totalGuests = null;
 
-        response.setId(listing.getId());
-        response.setTitle(listing.getTitle());
-        response.setLocation(listing.getLocation());
-        response.setDescription(listing.getDescription());
-        response.setReviewCount(reviewCount);
-        response.setAverageRating(averageRating != null ? averageRating : 0.0);
-        response.setRating(listing.getRating());
-        response.setImages(listing.getImages());
-        response.setAmenities(listing.getAmenities());
-        response.setAvailableFrom(listing.getAvailableFrom());
-        response.setStatus(listing.getStatus());
-        response.setCreatedAt(listing.getCreatedAt());
-        response.setLowestPrice(listing.getLowestPrice());
-        response.setHighestPrice(listing.getHighestPrice());
-        response.setLatitude(listing.getLatitude());
-        response.setLongitude(listing.getLongitude());
-
-        if (listing.getUnits() != null) {
-            response.setUnits(
-                    listing.getUnits()
-                            .stream()
-                            .map(unit -> {
-                                var unitResponse = new hr.pocetnik.bookingapp.dto.listing.ListingUnitResponse();
-
-                                unitResponse.setId(unit.getId());
-                                unitResponse.setType(unit.getType());
-                                unitResponse.setLabel(unit.getLabel());
-                                unitResponse.setQuantity(unit.getQuantity());
-                                unitResponse.setPricePerNight(unit.getPricePerNight());
-                                unitResponse.setMaxGuests(unit.getMaxGuests());
-
-                                return unitResponse;
-                            })
-                            .toList());
+        if (adults != null || children != null) {
+            totalGuests = (adults != null ? adults : 0)
+                    + (children != null ? children : 0);
         }
 
-        if (listing.getPriceAdjustments() != null) {
-            response.setPriceAdjustments(
-                    listing.getPriceAdjustments()
-                            .stream()
-                            .map(adjustment -> {
-                                var adjustmentResponse = new hr.pocetnik.bookingapp.dto.listing.ListingPriceAdjustmentResponse();
+        List<ListingEntity> listings;
 
-                                adjustmentResponse.setId(adjustment.getId());
-                                adjustmentResponse.setStartDate(adjustment.getStartDate());
-                                adjustmentResponse.setEndDate(adjustment.getEndDate());
-                                adjustmentResponse.setPercent(adjustment.getPercent());
-
-                                return adjustmentResponse;
-                            })
-                            .toList());
+        if (checkIn == null) {
+            listings = listingRepository.searchListingsWithoutDate(
+                    ListingStatus.APPROVED,
+                    blankToNull(location),
+                    rooms,
+                    totalGuests);
+        } else {
+            listings = listingRepository.searchListingsWithDate(
+                    ListingStatus.APPROVED,
+                    blankToNull(location),
+                    checkIn,
+                    rooms,
+                    totalGuests);
         }
 
-        if (listing.getSeller() != null) {
-            response.setSellerEmail(listing.getSeller().getEmail());
+        return listings.stream()
+                .map(this::mapToResponse)
+                .toList();
+    }
+
+    private String blankToNull(String value) {
+        if (value == null || value.isBlank()) {
+            return null;
         }
 
-        return response;
+        return value.trim();
     }
 
     @Override
@@ -363,4 +344,71 @@ public class ListingServiceImpl implements ListingService {
         return listingRepository.findDistinctLocations();
     }
 
+    private ListingResponse mapToResponse(
+            ListingEntity listing) {
+
+        ListingResponse response = new ListingResponse();
+        Long reviewCount = reviewRepository.countByListingId(listing.getId());
+        Double averageRating = reviewRepository.findAverageRatingByListingId(listing.getId());
+
+        response.setId(listing.getId());
+        response.setTitle(listing.getTitle());
+        response.setLocation(listing.getLocation());
+        response.setDescription(listing.getDescription());
+        response.setReviewCount(reviewCount);
+        response.setAverageRating(averageRating != null ? averageRating : 0.0);
+        response.setRating(listing.getRating());
+        response.setImages(listing.getImages());
+        response.setAmenities(listing.getAmenities());
+        response.setAvailableFrom(listing.getAvailableFrom());
+        response.setStatus(listing.getStatus());
+        response.setCreatedAt(listing.getCreatedAt());
+        response.setLowestPrice(listing.getLowestPrice());
+        response.setHighestPrice(listing.getHighestPrice());
+        response.setLatitude(listing.getLatitude());
+        response.setLongitude(listing.getLongitude());
+
+        if (listing.getUnits() != null) {
+            response.setUnits(
+                    listing.getUnits()
+                            .stream()
+                            .map(unit -> {
+                                var unitResponse = new hr.pocetnik.bookingapp.dto.listing.ListingUnitResponse();
+
+                                unitResponse.setId(unit.getId());
+                                unitResponse.setType(unit.getType());
+                                unitResponse.setLabel(unit.getLabel());
+                                unitResponse.setQuantity(unit.getQuantity());
+                                unitResponse.setRoomCount(unit.getRoomCount());
+                                unitResponse.setPricePerNight(unit.getPricePerNight());
+                                unitResponse.setMaxGuests(unit.getMaxGuests());
+
+                                return unitResponse;
+                            })
+                            .toList());
+        }
+
+        if (listing.getPriceAdjustments() != null) {
+            response.setPriceAdjustments(
+                    listing.getPriceAdjustments()
+                            .stream()
+                            .map(adjustment -> {
+                                var adjustmentResponse = new hr.pocetnik.bookingapp.dto.listing.ListingPriceAdjustmentResponse();
+
+                                adjustmentResponse.setId(adjustment.getId());
+                                adjustmentResponse.setStartDate(adjustment.getStartDate());
+                                adjustmentResponse.setEndDate(adjustment.getEndDate());
+                                adjustmentResponse.setPercent(adjustment.getPercent());
+
+                                return adjustmentResponse;
+                            })
+                            .toList());
+        }
+
+        if (listing.getSeller() != null) {
+            response.setSellerEmail(listing.getSeller().getEmail());
+        }
+
+        return response;
+    }
 }

@@ -1,5 +1,6 @@
 package hr.pocetnik.bookingapp.service;
 
+import java.time.LocalDate;
 import java.util.List;
 import hr.pocetnik.bookingapp.dto.listing.ListingAvailableUnitResponse;
 import hr.pocetnik.bookingapp.dto.listing.ListingRequest;
@@ -33,5 +34,12 @@ public interface ListingService {
 
         List<String> getLocations();
 
-        
+        List<ListingResponse> searchListings(
+                        String location,
+                        LocalDate checkIn,
+                        LocalDate checkOut,
+                        Integer adults,
+                        Integer children,
+                        Integer rooms);
+
 }
