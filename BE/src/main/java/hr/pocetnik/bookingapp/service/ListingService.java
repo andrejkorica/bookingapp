@@ -1,5 +1,6 @@
 package hr.pocetnik.bookingapp.service;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import hr.pocetnik.bookingapp.dto.listing.ListingAvailableUnitResponse;
@@ -41,7 +42,9 @@ public interface ListingService {
                         Integer adults,
                         Integer children,
                         Integer rooms,
-                        List<String> amenities);
+                        List<String> amenities,
+                        BigDecimal minPrice,
+                        BigDecimal maxPrice);
 
         List<String> getAmenities();
 

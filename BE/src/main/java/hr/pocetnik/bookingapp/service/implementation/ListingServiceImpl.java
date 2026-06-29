@@ -21,6 +21,7 @@ import hr.pocetnik.bookingapp.service.ListingService;
 
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -255,7 +256,9 @@ public class ListingServiceImpl implements ListingService {
             Integer adults,
             Integer children,
             Integer rooms,
-            List<String> amenities) {
+            List<String> amenities,
+            BigDecimal minPrice,
+            BigDecimal maxPrice) {
 
         String cleanedLocation = blankToNull(location);
 
@@ -282,6 +285,15 @@ public class ListingServiceImpl implements ListingService {
                 .filter(listing -> cleanedAmenities.isEmpty()
                         || (listing.getAmenities() != null
                                 && listing.getAmenities().containsAll(cleanedAmenities)))
+
+                .filter(listing -> minPrice == null
+                        || (listing.getLowestPrice() != null
+                                && listing.getLowestPrice().compareTo(minPrice) >= 0))
+
+                .filter(listing -> maxPrice == null
+                        || (listing.getHighestPrice() != null
+                                && listing.getHighestPrice().compareTo(maxPrice) <= 0))
+
                 .filter(listing -> checkIn == null || checkOut == null
                         || hasAvailableUnitsForSearch(
                                 listing,
@@ -289,6 +301,7 @@ public class ListingServiceImpl implements ListingService {
                                 checkOut,
                                 rooms,
                                 totalGuests))
+
                 .map(this::mapToResponse)
                 .toList();
     }

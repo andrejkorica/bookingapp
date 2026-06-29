@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -79,50 +80,52 @@ public class ListingController {
 
         return listingService.getAvailableUnits(listingId);
     }
-@GetMapping("/listings")
-public List<ListingResponse> getAllApprovedListings(
-        @RequestParam(required = false) String location,
-        @RequestParam(required = false) LocalDate checkIn,
-        @RequestParam(required = false) LocalDate checkOut,
-        @RequestParam(required = false) Integer adults,
-        @RequestParam(required = false) Integer children,
-        @RequestParam(required = false) Integer rooms,
-        @RequestParam(required = false) List<String> amenities) {
 
-    System.out.println("=== GET /listings ===");
-    System.out.println("location = " + location);
-    System.out.println("checkIn = " + checkIn);
-    System.out.println("checkOut = " + checkOut);
-    System.out.println("adults = " + adults);
-    System.out.println("children = " + children);
-    System.out.println("rooms = " + rooms);
-    System.out.println("amenities = " + amenities);
+    @GetMapping("/listings")
+    public List<ListingResponse> getAllApprovedListings(
+            @RequestParam(required = false) String location,
+            @RequestParam(required = false) LocalDate checkIn,
+            @RequestParam(required = false) LocalDate checkOut,
+            @RequestParam(required = false) Integer adults,
+            @RequestParam(required = false) Integer children,
+            @RequestParam(required = false) Integer rooms,
+            @RequestParam(required = false) List<String> amenities,
+            @RequestParam(required = false) BigDecimal minPrice,
+            @RequestParam(required = false) BigDecimal maxPrice)
 
-    boolean hasFilters = location != null ||
-            checkIn != null ||
-            checkOut != null ||
-            adults != null ||
-            children != null ||
-            rooms != null ||
-            amenities != null;
+    {
 
-    System.out.println("hasFilters = " + hasFilters);
+        System.out.println("min: " + minPrice + ", max: " + maxPrice);
 
-    if (hasFilters) {
-        System.out.println("Calling searchListings()");
-        return listingService.searchListings(
-                location,
-                checkIn,
-                checkOut,
-                adults,
-                children,
-                rooms,
-                amenities);
+        boolean hasFilters = location != null ||
+                checkIn != null ||
+                checkOut != null ||
+                adults != null ||
+                children != null ||
+                rooms != null ||
+                amenities != null ||
+                minPrice != null ||
+                maxPrice != null;
+
+        System.out.println("hasFilters = " + hasFilters);
+
+        if (hasFilters) {
+            System.out.println("Calling searchListings()");
+            return listingService.searchListings(
+                    location,
+                    checkIn,
+                    checkOut,
+                    adults,
+                    children,
+                    rooms,
+                    amenities,
+                    minPrice,
+                    maxPrice);
+        }
+
+        System.out.println("Calling getAllApprovedListings()");
+        return listingService.getAllApprovedListings();
     }
-
-    System.out.println("Calling getAllApprovedListings()");
-    return listingService.getAllApprovedListings();
-}
 
     @GetMapping("/listings/amenities")
     public ResponseEntity<List<String>> getAmenities() {

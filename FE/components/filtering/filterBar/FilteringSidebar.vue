@@ -8,9 +8,12 @@ const route = useRoute();
 
 const rating = ref<number | null>(null);
 
-const priceRange = ref({
-  min: null,
-  max: null,
+const priceRange = ref<{
+  min: number | null;
+  max: number | null;
+}>({
+  min: typeof route.query.minPrice === "string" ? Number(route.query.minPrice) : null,
+  max: typeof route.query.maxPrice === "string" ? Number(route.query.maxPrice) : null,
 });
 
 const selectedAmenities = ref<string[]>(
@@ -30,6 +33,20 @@ watch(
         amenities: selectedAmenities.value.length
           ? selectedAmenities.value
           : undefined,
+      },
+    });
+  },
+  { deep: true },
+);
+
+watch(
+  priceRange,
+  () => {
+    router.replace({
+      query: {
+        ...route.query,
+        minPrice: priceRange.value.min ?? undefined,
+        maxPrice: priceRange.value.max ?? undefined,
       },
     });
   },

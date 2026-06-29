@@ -46,6 +46,8 @@ async function fetchListings() {
           children: route.query.children,
           rooms: route.query.rooms,
           amenities: amenitiesQuery,
+          minPrice: route.query.minPrice,
+          maxPrice: route.query.maxPrice,
         },
       },
     );
@@ -75,9 +77,7 @@ watch(() => route.fullPath, fetchListings, { immediate: true });
         <section class="min-w-0 flex-1 pb-12">
           <div class="mb-4 flex items-center justify-between gap-4">
             <div>
-              <h1 class="text-2xl font-bold text-slate-900">
-                Search results
-              </h1>
+              <h1 class="text-2xl font-bold text-slate-900">Search results</h1>
 
               <p class="mt-1 text-sm text-slate-500">
                 {{ listings.length }} properties found
