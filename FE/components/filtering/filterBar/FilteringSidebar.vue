@@ -3,6 +3,9 @@ import FilteringAmenities from "~/components/filtering/filterBar/FilteringAmenit
 import FilteringPriceRange from "~/components/filtering/filterBar/FilteringPriceRange.vue";
 import FilteringRating from "~/components/filtering/filterBar/FilteringRating.vue";
 
+const router = useRouter();
+const route = useRoute();
+
 const rating = ref<number | null>(null);
 
 const priceRange = ref({
@@ -10,11 +13,32 @@ const priceRange = ref({
   max: null,
 });
 
-const selectedAmenities = ref<string[]>([]);
+const selectedAmenities = ref<string[]>(
+  Array.isArray(route.query.amenities)
+    ? route.query.amenities.filter((item): item is string => typeof item === "string")
+    : typeof route.query.amenities === "string"
+      ? [route.query.amenities]
+      : [],
+);
+
+watch(
+  selectedAmenities,
+  () => {
+    router.replace({
+      query: {
+        ...route.query,
+        amenities: selectedAmenities.value.length
+          ? selectedAmenities.value
+          : undefined,
+      },
+    });
+  },
+  { deep: true },
+);
 </script>
 
 <template>
-  <aside class="rounded-xl border border-slate-200 bg-white mb-5">
+  <aside class="mb-5 rounded-xl border border-slate-200 bg-white">
     <div class="border-b border-slate-200 p-4">
       <h2 class="font-bold text-slate-900">Filter by:</h2>
     </div>

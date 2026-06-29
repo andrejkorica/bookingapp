@@ -4,13 +4,12 @@ import {
   getLocalTimeZone,
   parseDate,
 } from "@internationalized/date";
-import type { DateValue } from "@internationalized/date";
+
+import type { DateRangeValue } from "~/types/FilteringTypes" 
+
 import FilteringGuestSelector from "~/components/filtering/FilteringGuestSelector.vue";
 
-type DateRangeValue = {
-  start: DateValue | undefined;
-  end: DateValue | undefined;
-};
+
 
 const config = useRuntimeConfig();
 const router = useRouter();
@@ -107,6 +106,7 @@ function handleSearch() {
       adults: guestInfo.value.adults,
       children: guestInfo.value.children,
       rooms: guestInfo.value.rooms,
+      
     },
   });
 }

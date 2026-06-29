@@ -254,56 +254,41 @@ public class ListingServiceImpl implements ListingService {
             LocalDate checkOut,
             Integer adults,
             Integer children,
-            Integer rooms) {
-
-        final Integer totalGuests = (adults == null && children == null)
-                ? null
-                : (adults != null ? adults : 0)
-                        + (children != null ? children : 0);
+            Integer rooms,
+            List<String> amenities) {
 
         String cleanedLocation = blankToNull(location);
 
-        List<ListingEntity> listings;
+        final Integer totalGuests = (adults == null && children == null)
+                ? null
+                : (adults == null ? 0 : adults)
+                        + (children == null ? 0 : children);
 
-        if (checkIn == null && cleanedLocation == null) {
-            listings = listingRepository.searchWithoutDateWithoutLocation(
-                    ListingStatus.APPROVED,
-                    rooms,
-                    totalGuests);
-        } else if (checkIn == null) {
-            listings = listingRepository.searchWithoutDateWithLocation(
-                    ListingStatus.APPROVED,
-                    cleanedLocation,
-                    rooms,
-                    totalGuests);
-        } else if (cleanedLocation == null) {
-            listings = listingRepository.searchWithDateWithoutLocation(
-                    ListingStatus.APPROVED,
-                    checkIn,
-                    rooms,
-                    totalGuests);
-        } else {
-            listings = listingRepository.searchWithDateWithLocation(
-                    ListingStatus.APPROVED,
-                    cleanedLocation,
-                    checkIn,
-                    rooms,
-                    totalGuests);
-        }
+        List<ListingEntity> listings = listingRepository.searchListings(
+                ListingStatus.APPROVED,
+                cleanedLocation,
+                checkIn,
+                rooms,
+                totalGuests);
 
-        if (checkIn == null || checkOut == null) {
-            return listings.stream()
-                    .map(this::mapToResponse)
-                    .toList();
-        }
+        List<String> cleanedAmenities = amenities == null
+                ? List.of()
+                : amenities.stream()
+                        .filter(amenity -> amenity != null && !amenity.isBlank())
+                        .map(String::trim)
+                        .toList();
 
         return listings.stream()
-                .filter(listing -> hasAvailableUnitsForSearch(
-                        listing,
-                        checkIn,
-                        checkOut,
-                        rooms,
-                        totalGuests))
+                .filter(listing -> cleanedAmenities.isEmpty()
+                        || (listing.getAmenities() != null
+                                && listing.getAmenities().containsAll(cleanedAmenities)))
+                .filter(listing -> checkIn == null || checkOut == null
+                        || hasAvailableUnitsForSearch(
+                                listing,
+                                checkIn,
+                                checkOut,
+                                rooms,
+                                totalGuests))
                 .map(this::mapToResponse)
                 .toList();
     }
@@ -406,6 +391,11 @@ public class ListingServiceImpl implements ListingService {
     @Override
     public List<String> getLocations() {
         return listingRepository.findDistinctLocations();
+    }
+
+    @Override
+    public List<String> getAmenities() {
+        return listingRepository.findDistinctAmenities();
     }
 
     private ListingResponse mapToResponse(

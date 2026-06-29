@@ -12,6 +12,14 @@ const config = useRuntimeConfig();
 const listings = ref<Listing[]>([]);
 const isLoading = ref(false);
 
+const page = ref(1);
+const itemsPerPage = 8;
+
+const paginatedListings = computed(() => {
+  const start = (page.value - 1) * itemsPerPage;
+  return listings.value.slice(start, start + itemsPerPage);
+});
+
 async function fetchListings() {
   isLoading.value = true;
 
@@ -19,6 +27,8 @@ async function fetchListings() {
     listings.value = await $fetch<Listing[]>(
       `${config.public.apiBase}/listings`,
     );
+
+    page.value = 1;
   } catch (error) {
     console.error(error);
     listings.value = [];
@@ -47,12 +57,22 @@ onMounted(fetchListings);
           No listings found.
         </div>
 
-        <div v-else class="grid grid-cols-1 gap-8 lg:grid-cols-2">
-          <ListingCard
-            v-for="listing in listings"
-            :key="listing.id"
-            :listing="listing"
-          />
+        <div v-else>
+          <div class="grid grid-cols-1 gap-8 lg:grid-cols-2">
+            <ListingCard
+              v-for="listing in paginatedListings"
+              :key="listing.id"
+              :listing="listing"
+            />
+          </div>
+
+          <div class="mt-8 flex justify-center">
+            <UPagination
+              v-model:page="page"
+              :items-per-page="itemsPerPage"
+              :total="listings.length"
+            />
+          </div>
         </div>
       </section>
     </main>

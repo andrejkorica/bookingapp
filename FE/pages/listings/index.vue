@@ -5,13 +5,11 @@ import ListingCard from "~/components/listings/ListingCard.vue";
 import FilteringSortDropdown from "~/components/filtering/FilteringSortDropdown.vue";
 import type { Listing } from "~/types/ListingTypes";
 
-
-const sort = ref("top");
-
 definePageMeta({
   layout: "default",
 });
 
+const sort = ref("top");
 
 const config = useRuntimeConfig();
 const route = useRoute();
@@ -19,8 +17,22 @@ const route = useRoute();
 const listings = ref<Listing[]>([]);
 const isLoading = ref(false);
 
+const page = ref(1);
+const itemsPerPage = 8;
+
+const paginatedListings = computed(() => {
+  const start = (page.value - 1) * itemsPerPage;
+  return listings.value.slice(start, start + itemsPerPage);
+});
+
 async function fetchListings() {
   isLoading.value = true;
+
+  const amenitiesQuery = Array.isArray(route.query.amenities)
+    ? route.query.amenities
+    : route.query.amenities
+      ? [route.query.amenities]
+      : undefined;
 
   try {
     listings.value = await $fetch<Listing[]>(
@@ -33,9 +45,12 @@ async function fetchListings() {
           adults: route.query.adults,
           children: route.query.children,
           rooms: route.query.rooms,
+          amenities: amenitiesQuery,
         },
       },
     );
+
+    page.value = 1;
   } catch (error) {
     console.error(error);
     listings.value = [];
@@ -44,7 +59,7 @@ async function fetchListings() {
   }
 }
 
-watch(() => route.query, fetchListings, { immediate: true });
+watch(() => route.fullPath, fetchListings, { immediate: true });
 </script>
 
 <template>
@@ -60,7 +75,9 @@ watch(() => route.query, fetchListings, { immediate: true });
         <section class="min-w-0 flex-1 pb-12">
           <div class="mb-4 flex items-center justify-between gap-4">
             <div>
-              <h1 class="text-2xl font-bold text-slate-900">Search results</h1>
+              <h1 class="text-2xl font-bold text-slate-900">
+                Search results
+              </h1>
 
               <p class="mt-1 text-sm text-slate-500">
                 {{ listings.length }} properties found
@@ -68,7 +85,6 @@ watch(() => route.query, fetchListings, { immediate: true });
             </div>
 
             <FilteringSortDropdown v-model="sort" />
-
           </div>
 
           <div v-if="isLoading" class="py-12 text-center text-slate-500">
@@ -82,12 +98,22 @@ watch(() => route.query, fetchListings, { immediate: true });
             No listings found.
           </div>
 
-          <div v-else class="space-y-5">
-            <ListingCard
-              v-for="listing in listings"
-              :key="listing.id"
-              :listing="listing"
-            />
+          <div v-else>
+            <div class="space-y-5">
+              <ListingCard
+                v-for="listing in paginatedListings"
+                :key="listing.id"
+                :listing="listing"
+              />
+            </div>
+
+            <div class="mt-8 flex justify-center">
+              <UPagination
+                v-model:page="page"
+                :items-per-page="itemsPerPage"
+                :total="listings.length"
+              />
+            </div>
           </div>
         </section>
       </div>

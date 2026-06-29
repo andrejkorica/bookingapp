@@ -12,6 +12,7 @@ import CreateListingPriceAdjustments from "~/components/listings/create/CreateLi
 import CreateListingLocation from "~/components/listings/create/CreateListingLocation.vue";
 import CreateListingImagePreview from "~/components/listings/create/CreateListingImagePreview.vue";
 import CreateListingUnits from "~/components/listings/create/CreateListingUnits.vue";
+
 definePageMeta({
   layout: "default",
   middleware: "seller-guard",

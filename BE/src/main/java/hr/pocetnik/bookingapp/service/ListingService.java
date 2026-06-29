@@ -40,6 +40,9 @@ public interface ListingService {
                         LocalDate checkOut,
                         Integer adults,
                         Integer children,
-                        Integer rooms);
+                        Integer rooms,
+                        List<String> amenities);
+
+        List<String> getAmenities();
 
 }

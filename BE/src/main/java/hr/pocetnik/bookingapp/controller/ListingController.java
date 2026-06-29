@@ -42,7 +42,7 @@ public class ListingController {
         return listingService.getMyListings(
                 email);
     }
-    
+
     @GetMapping("/listings/locations")
     public ResponseEntity<List<String>> getLocations() {
         return ResponseEntity.ok(listingService.getLocations());
@@ -79,33 +79,54 @@ public class ListingController {
 
         return listingService.getAvailableUnits(listingId);
     }
+@GetMapping("/listings")
+public List<ListingResponse> getAllApprovedListings(
+        @RequestParam(required = false) String location,
+        @RequestParam(required = false) LocalDate checkIn,
+        @RequestParam(required = false) LocalDate checkOut,
+        @RequestParam(required = false) Integer adults,
+        @RequestParam(required = false) Integer children,
+        @RequestParam(required = false) Integer rooms,
+        @RequestParam(required = false) List<String> amenities) {
 
-    @GetMapping("/listings")
-    public List<ListingResponse> getAllApprovedListings(
-            @RequestParam(required = false) String location,
-            @RequestParam(required = false) LocalDate checkIn,
-            @RequestParam(required = false) LocalDate checkOut,
-            @RequestParam(required = false) Integer adults,
-            @RequestParam(required = false) Integer children,
-            @RequestParam(required = false) Integer rooms) {
-        boolean hasFilters = location != null ||
-                checkIn != null ||
-                checkOut != null ||
-                adults != null ||
-                children != null ||
-                rooms != null;
+    System.out.println("=== GET /listings ===");
+    System.out.println("location = " + location);
+    System.out.println("checkIn = " + checkIn);
+    System.out.println("checkOut = " + checkOut);
+    System.out.println("adults = " + adults);
+    System.out.println("children = " + children);
+    System.out.println("rooms = " + rooms);
+    System.out.println("amenities = " + amenities);
 
-        if (hasFilters) {
-            return listingService.searchListings(
-                    location,
-                    checkIn,
-                    checkOut,
-                    adults,
-                    children,
-                    rooms);
-        }
+    boolean hasFilters = location != null ||
+            checkIn != null ||
+            checkOut != null ||
+            adults != null ||
+            children != null ||
+            rooms != null ||
+            amenities != null;
 
-        return listingService.getAllApprovedListings();
+    System.out.println("hasFilters = " + hasFilters);
+
+    if (hasFilters) {
+        System.out.println("Calling searchListings()");
+        return listingService.searchListings(
+                location,
+                checkIn,
+                checkOut,
+                adults,
+                children,
+                rooms,
+                amenities);
+    }
+
+    System.out.println("Calling getAllApprovedListings()");
+    return listingService.getAllApprovedListings();
+}
+
+    @GetMapping("/listings/amenities")
+    public ResponseEntity<List<String>> getAmenities() {
+        return ResponseEntity.ok(listingService.getAmenities());
     }
 
 }

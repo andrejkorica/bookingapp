@@ -33,62 +33,25 @@ public interface ListingRepository extends JpaRepository<ListingEntity, Long> {
                             from ListingEntity l
                             join l.units u
                             where l.status = :status
+                            and lower(l.location) like lower(concat('%', coalesce(:location, ''), '%'))
+                            and (:checkIn is null or l.availableFrom <= :checkIn)
                             and (:rooms is null or u.roomCount >= :rooms)
                             and (:totalGuests is null or u.maxGuests >= :totalGuests)
                             order by l.createdAt desc
                         """)
-        List<ListingEntity> searchWithoutDateWithoutLocation(
-                        @Param("status") ListingStatus status,
-                        @Param("rooms") Integer rooms,
-                        @Param("totalGuests") Integer totalGuests);
-
-        @Query("""
-                            select distinct l
-                            from ListingEntity l
-                            join l.units u
-                            where l.status = :status
-                            and lower(l.location) like lower(concat('%', :location, '%'))
-                            and (:rooms is null or u.roomCount >= :rooms)
-                            and (:totalGuests is null or u.maxGuests >= :totalGuests)
-                            order by l.createdAt desc
-                        """)
-        List<ListingEntity> searchWithoutDateWithLocation(
-                        @Param("status") ListingStatus status,
-                        @Param("location") String location,
-                        @Param("rooms") Integer rooms,
-                        @Param("totalGuests") Integer totalGuests);
-
-        @Query("""
-                            select distinct l
-                            from ListingEntity l
-                            join l.units u
-                            where l.status = :status
-                            and l.availableFrom <= :checkIn
-                            and (:rooms is null or u.roomCount >= :rooms)
-                            and (:totalGuests is null or u.maxGuests >= :totalGuests)
-                            order by l.createdAt desc
-                        """)
-        List<ListingEntity> searchWithDateWithoutLocation(
-                        @Param("status") ListingStatus status,
-                        @Param("checkIn") LocalDate checkIn,
-                        @Param("rooms") Integer rooms,
-                        @Param("totalGuests") Integer totalGuests);
-
-        @Query("""
-                            select distinct l
-                            from ListingEntity l
-                            join l.units u
-                            where l.status = :status
-                            and lower(l.location) like lower(concat('%', :location, '%'))
-                            and l.availableFrom <= :checkIn
-                            and (:rooms is null or u.roomCount >= :rooms)
-                            and (:totalGuests is null or u.maxGuests >= :totalGuests)
-                            order by l.createdAt desc
-                        """)
-        List<ListingEntity> searchWithDateWithLocation(
+        List<ListingEntity> searchListings(
                         @Param("status") ListingStatus status,
                         @Param("location") String location,
                         @Param("checkIn") LocalDate checkIn,
                         @Param("rooms") Integer rooms,
                         @Param("totalGuests") Integer totalGuests);
+
+        @Query("""
+                            select distinct amenity
+                            from ListingEntity l
+                            join l.amenities amenity
+                            order by amenity
+                        """)
+                        
+        List<String> findDistinctAmenities();
 }
