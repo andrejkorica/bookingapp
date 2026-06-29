@@ -91,40 +91,22 @@ public class ListingController {
             @RequestParam(required = false) Integer rooms,
             @RequestParam(required = false) List<String> amenities,
             @RequestParam(required = false) BigDecimal minPrice,
-            @RequestParam(required = false) BigDecimal maxPrice)
+            @RequestParam(required = false) BigDecimal maxPrice,
+            @RequestParam(required = false) Integer rating,
+            @RequestParam(required = false, defaultValue = "top") String sort) {
 
-    {
-
-        System.out.println("min: " + minPrice + ", max: " + maxPrice);
-
-        boolean hasFilters = location != null ||
-                checkIn != null ||
-                checkOut != null ||
-                adults != null ||
-                children != null ||
-                rooms != null ||
-                amenities != null ||
-                minPrice != null ||
-                maxPrice != null;
-
-        System.out.println("hasFilters = " + hasFilters);
-
-        if (hasFilters) {
-            System.out.println("Calling searchListings()");
-            return listingService.searchListings(
-                    location,
-                    checkIn,
-                    checkOut,
-                    adults,
-                    children,
-                    rooms,
-                    amenities,
-                    minPrice,
-                    maxPrice);
-        }
-
-        System.out.println("Calling getAllApprovedListings()");
-        return listingService.getAllApprovedListings();
+        return listingService.searchListings(
+                location,
+                checkIn,
+                checkOut,
+                adults,
+                children,
+                rooms,
+                amenities,
+                minPrice,
+                maxPrice,
+                rating,
+                sort);
     }
 
     @GetMapping("/listings/amenities")

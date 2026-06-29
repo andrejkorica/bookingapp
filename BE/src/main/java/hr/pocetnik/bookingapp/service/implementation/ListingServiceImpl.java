@@ -24,10 +24,13 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Comparator;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class ListingServiceImpl implements ListingService {
@@ -248,63 +251,97 @@ public class ListingServiceImpl implements ListingService {
                 .collect(Collectors.toList());
     }
 
-    @Override
-    public List<ListingResponse> searchListings(
-            String location,
-            LocalDate checkIn,
-            LocalDate checkOut,
-            Integer adults,
-            Integer children,
-            Integer rooms,
-            List<String> amenities,
-            BigDecimal minPrice,
-            BigDecimal maxPrice) {
+   @Override
+public List<ListingResponse> searchListings(
+        String location,
+        LocalDate checkIn,
+        LocalDate checkOut,
+        Integer adults,
+        Integer children,
+        Integer rooms,
+        List<String> amenities,
+        BigDecimal minPrice,
+        BigDecimal maxPrice,
+        Integer rating,
+        String sort) {
 
-        String cleanedLocation = blankToNull(location);
+    String cleanedLocation = blankToNull(location);
 
-        final Integer totalGuests = (adults == null && children == null)
-                ? null
-                : (adults == null ? 0 : adults)
-                        + (children == null ? 0 : children);
+    final Integer totalGuests = (adults == null && children == null)
+            ? null
+            : (adults == null ? 0 : adults)
+                    + (children == null ? 0 : children);
 
-        List<ListingEntity> listings = listingRepository.searchListings(
-                ListingStatus.APPROVED,
-                cleanedLocation,
-                checkIn,
-                rooms,
-                totalGuests);
+    List<ListingEntity> listings = listingRepository.searchListings(
+            ListingStatus.APPROVED,
+            cleanedLocation,
+            checkIn,
+            rooms,
+            totalGuests);
 
-        List<String> cleanedAmenities = amenities == null
-                ? List.of()
-                : amenities.stream()
-                        .filter(amenity -> amenity != null && !amenity.isBlank())
-                        .map(String::trim)
-                        .toList();
+    List<String> cleanedAmenities = amenities == null
+            ? List.of()
+            : amenities.stream()
+                    .filter(amenity -> amenity != null && !amenity.isBlank())
+                    .map(String::trim)
+                    .toList();
 
-        return listings.stream()
-                .filter(listing -> cleanedAmenities.isEmpty()
-                        || (listing.getAmenities() != null
-                                && listing.getAmenities().containsAll(cleanedAmenities)))
+    Stream<ListingEntity> stream = listings.stream()
 
-                .filter(listing -> minPrice == null
-                        || (listing.getLowestPrice() != null
-                                && listing.getLowestPrice().compareTo(minPrice) >= 0))
+            // Amenities
+            .filter(listing -> cleanedAmenities.isEmpty()
+                    || (listing.getAmenities() != null
+                            && listing.getAmenities().containsAll(cleanedAmenities)))
 
-                .filter(listing -> maxPrice == null
-                        || (listing.getHighestPrice() != null
-                                && listing.getHighestPrice().compareTo(maxPrice) <= 0))
+            // Price
+            .filter(listing -> minPrice == null
+                    || (listing.getLowestPrice() != null
+                            && listing.getLowestPrice().compareTo(minPrice) >= 0))
 
-                .filter(listing -> checkIn == null || checkOut == null
-                        || hasAvailableUnitsForSearch(
-                                listing,
-                                checkIn,
-                                checkOut,
-                                rooms,
-                                totalGuests))
+            .filter(listing -> maxPrice == null
+                    || (listing.getHighestPrice() != null
+                            && listing.getHighestPrice().compareTo(maxPrice) <= 0))
 
-                .map(this::mapToResponse)
-                .toList();
+            // Rating
+            .filter(listing -> rating == null
+                    || (listing.getRating() != null
+                            && listing.getRating() >= rating))
+
+            // Availability
+            .filter(listing -> checkIn == null
+                    || checkOut == null
+                    || hasAvailableUnitsForSearch(
+                            listing,
+                            checkIn,
+                            checkOut,
+                            rooms,
+                            totalGuests));
+
+    // Sorting
+    switch (sort) {
+        case "price_asc" ->
+                stream = stream.sorted(Comparator.comparing(ListingEntity::getLowestPrice));
+
+        case "price_desc" ->
+                stream = stream.sorted(
+                        Comparator.comparing(ListingEntity::getLowestPrice).reversed());
+
+        case "rating_asc" ->
+                stream = stream.sorted(Comparator.comparing(ListingEntity::getRating));
+
+        case "rating_desc" ->
+                stream = stream.sorted(
+                        Comparator.comparing(ListingEntity::getRating).reversed());
+
+        default ->
+                stream = stream.sorted(
+                        Comparator.comparing(ListingEntity::getCreatedAt).reversed());
     }
+
+    return stream
+            .map(this::mapToResponse)
+            .toList();
+}
 
     private String blankToNull(String value) {
         if (value == null || value.isBlank()) {

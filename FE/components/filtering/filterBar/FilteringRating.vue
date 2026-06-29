@@ -1,6 +1,19 @@
 <script setup lang="ts">
-const rating = defineModel<number | null>({
-  required: true,
+
+const router = useRouter();
+const route = useRoute();
+
+const rating = ref<number | null>(
+  typeof route.query.rating === "string" ? Number(route.query.rating) : null,
+);
+
+watch(rating, () => {
+  router.replace({
+    query: {
+      ...route.query,
+      rating: rating.value ?? undefined,
+    },
+  });
 });
 
 const ratingOptions = [

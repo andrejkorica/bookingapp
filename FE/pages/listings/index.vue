@@ -20,6 +20,8 @@ const isLoading = ref(false);
 const page = ref(1);
 const itemsPerPage = 8;
 
+watch([() => route.fullPath, sort], fetchListings, { immediate: true });
+
 const paginatedListings = computed(() => {
   const start = (page.value - 1) * itemsPerPage;
   return listings.value.slice(start, start + itemsPerPage);
@@ -48,6 +50,8 @@ async function fetchListings() {
           amenities: amenitiesQuery,
           minPrice: route.query.minPrice,
           maxPrice: route.query.maxPrice,
+          rating: route.query.rating,
+          sort: sort.value,
         },
       },
     );

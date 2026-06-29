@@ -44,7 +44,9 @@ public interface ListingService {
                         Integer rooms,
                         List<String> amenities,
                         BigDecimal minPrice,
-                        BigDecimal maxPrice);
+                        BigDecimal maxPrice,
+                        Integer rating,
+                        String sort);
 
         List<String> getAmenities();
 

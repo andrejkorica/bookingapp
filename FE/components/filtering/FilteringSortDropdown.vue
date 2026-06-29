@@ -3,31 +3,47 @@ const sort = defineModel<string>({
   default: "top",
 });
 
-const items = [
+
+const items = computed(() => [
   {
     label: "Our top picks",
     value: "top",
+    onSelect: () => {
+      sort.value = "top";
+    },
   },
   {
     label: "Price highest first",
     value: "price_desc",
+    onSelect: () => {
+      sort.value = "price_desc";
+    },
   },
   {
     label: "Price lowest first",
     value: "price_asc",
+    onSelect: () => {
+      sort.value = "price_asc";
+    },
   },
   {
     label: "Rating high to low",
     value: "rating_desc",
+    onSelect: () => {
+      sort.value = "rating_desc";
+    },
   },
   {
     label: "Rating low to high",
     value: "rating_asc",
+    onSelect: () => {
+      sort.value = "rating_asc";
+    },
   },
-];
+]);
 
 const selectedLabel = computed(() => {
-  return items.find((item) => item.value === sort.value)?.label ?? "Our top picks";
+  return items.value.find((item) => item.value === sort.value)?.label ?? "Our top picks";
 });
 </script>
 
