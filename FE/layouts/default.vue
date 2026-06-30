@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import Navbar from '~/components/navbar.vue';
+import Navbar from "~/components/Navbar.vue";
 </script>
 
 <template>
-  <div>
+  <div class="min-h-screen bg-slate-50">
     <Navbar />
 
-    <main class="min-h-screen bg-slate-50">
+    <main>
       <slot />
     </main>
   </div>

@@ -1,10 +1,8 @@
 <script setup lang="ts">
-type ListingImagePreview = {
-  previewUrl: string;
-};
+import type { ListingImage } from '~/types/ListingTypes';
 
 defineProps<{
-  images: ListingImagePreview[];
+  images: ListingImage[];
 }>();
 
 const open = defineModel<boolean>("open", { default: false });

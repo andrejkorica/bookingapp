@@ -54,4 +54,6 @@ public interface ListingRepository extends JpaRepository<ListingEntity, Long> {
                         """)
                         
         List<String> findDistinctAmenities();
+
+        Long countBySeller(UserEntity seller);
 }

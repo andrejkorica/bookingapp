@@ -3,6 +3,7 @@ package hr.pocetnik.bookingapp.service.implementation;
 import hr.pocetnik.bookingapp.dto.listing.ListingAvailableUnitResponse;
 import hr.pocetnik.bookingapp.dto.listing.ListingRequest;
 import hr.pocetnik.bookingapp.dto.listing.ListingResponse;
+import hr.pocetnik.bookingapp.dto.seller.SellerStatisticsResponse;
 import hr.pocetnik.bookingapp.enums.BookingStatus;
 import hr.pocetnik.bookingapp.enums.ListingStatus;
 import hr.pocetnik.bookingapp.model.BookingEntity;
@@ -251,97 +252,97 @@ public class ListingServiceImpl implements ListingService {
                 .collect(Collectors.toList());
     }
 
-   @Override
-public List<ListingResponse> searchListings(
-        String location,
-        LocalDate checkIn,
-        LocalDate checkOut,
-        Integer adults,
-        Integer children,
-        Integer rooms,
-        List<String> amenities,
-        BigDecimal minPrice,
-        BigDecimal maxPrice,
-        Integer rating,
-        String sort) {
+    @Override
+    public List<ListingResponse> searchListings(
+            String location,
+            LocalDate checkIn,
+            LocalDate checkOut,
+            Integer adults,
+            Integer children,
+            Integer rooms,
+            List<String> amenities,
+            BigDecimal minPrice,
+            BigDecimal maxPrice,
+            Integer rating,
+            String sort) {
 
-    String cleanedLocation = blankToNull(location);
+        String cleanedLocation = blankToNull(location);
 
-    final Integer totalGuests = (adults == null && children == null)
-            ? null
-            : (adults == null ? 0 : adults)
-                    + (children == null ? 0 : children);
+        final Integer totalGuests = (adults == null && children == null)
+                ? null
+                : (adults == null ? 0 : adults)
+                        + (children == null ? 0 : children);
 
-    List<ListingEntity> listings = listingRepository.searchListings(
-            ListingStatus.APPROVED,
-            cleanedLocation,
-            checkIn,
-            rooms,
-            totalGuests);
+        List<ListingEntity> listings = listingRepository.searchListings(
+                ListingStatus.APPROVED,
+                cleanedLocation,
+                checkIn,
+                rooms,
+                totalGuests);
 
-    List<String> cleanedAmenities = amenities == null
-            ? List.of()
-            : amenities.stream()
-                    .filter(amenity -> amenity != null && !amenity.isBlank())
-                    .map(String::trim)
-                    .toList();
+        List<String> cleanedAmenities = amenities == null
+                ? List.of()
+                : amenities.stream()
+                        .filter(amenity -> amenity != null && !amenity.isBlank())
+                        .map(String::trim)
+                        .toList();
 
-    Stream<ListingEntity> stream = listings.stream()
+        Stream<ListingEntity> stream = listings.stream()
 
-            // Amenities
-            .filter(listing -> cleanedAmenities.isEmpty()
-                    || (listing.getAmenities() != null
-                            && listing.getAmenities().containsAll(cleanedAmenities)))
+                // Amenities
+                .filter(listing -> cleanedAmenities.isEmpty()
+                        || (listing.getAmenities() != null
+                                && listing.getAmenities().containsAll(cleanedAmenities)))
 
-            // Price
-            .filter(listing -> minPrice == null
-                    || (listing.getLowestPrice() != null
-                            && listing.getLowestPrice().compareTo(minPrice) >= 0))
+                // Price
+                .filter(listing -> minPrice == null
+                        || (listing.getLowestPrice() != null
+                                && listing.getLowestPrice().compareTo(minPrice) >= 0))
 
-            .filter(listing -> maxPrice == null
-                    || (listing.getHighestPrice() != null
-                            && listing.getHighestPrice().compareTo(maxPrice) <= 0))
+                .filter(listing -> maxPrice == null
+                        || (listing.getHighestPrice() != null
+                                && listing.getHighestPrice().compareTo(maxPrice) <= 0))
 
-            // Rating
-            .filter(listing -> rating == null
-                    || (listing.getRating() != null
-                            && listing.getRating() >= rating))
+                // Rating
+                .filter(listing -> rating == null
+                        || (listing.getRating() != null
+                                && listing.getRating() >= rating))
 
-            // Availability
-            .filter(listing -> checkIn == null
-                    || checkOut == null
-                    || hasAvailableUnitsForSearch(
-                            listing,
-                            checkIn,
-                            checkOut,
-                            rooms,
-                            totalGuests));
+                // Availability
+                .filter(listing -> checkIn == null
+                        || checkOut == null
+                        || hasAvailableUnitsForSearch(
+                                listing,
+                                checkIn,
+                                checkOut,
+                                rooms,
+                                totalGuests));
 
-    // Sorting
-    switch (sort) {
-        case "price_asc" ->
+        // Sorting
+        switch (sort) {
+            case "price_asc" ->
                 stream = stream.sorted(Comparator.comparing(ListingEntity::getLowestPrice));
 
-        case "price_desc" ->
+            case "price_desc" ->
                 stream = stream.sorted(
                         Comparator.comparing(ListingEntity::getLowestPrice).reversed());
 
-        case "rating_asc" ->
+            case "rating_asc" ->
                 stream = stream.sorted(Comparator.comparing(ListingEntity::getRating));
 
-        case "rating_desc" ->
+            case "rating_desc" ->
                 stream = stream.sorted(
                         Comparator.comparing(ListingEntity::getRating).reversed());
 
-        default ->
+            default ->
                 stream = stream.sorted(
                         Comparator.comparing(ListingEntity::getCreatedAt).reversed());
-    }
+        }
 
-    return stream
-            .map(this::mapToResponse)
-            .toList();
-}
+        return stream
+                .map(this::mapToResponse)
+                .toList();
+    }
 
     private String blankToNull(String value) {
         if (value == null || value.isBlank()) {
@@ -446,6 +447,21 @@ public List<ListingResponse> searchListings(
     @Override
     public List<String> getAmenities() {
         return listingRepository.findDistinctAmenities();
+    }
+
+    @Override
+    public SellerStatisticsResponse getSellerDashboardStats(String sellerEmail) {
+        UserEntity seller = userRepository.findByEmail(sellerEmail)
+                .orElseThrow(() -> new RuntimeException("Seller not found"));
+
+        BigDecimal totalEarnings = bookingRepository.findTotalEarningsBySeller(seller);
+        Long totalListings = listingRepository.countBySeller(seller);
+        Long activeBookings = bookingRepository.countActiveBookingsBySeller(seller);
+
+        return new SellerStatisticsResponse(
+                totalEarnings,
+                totalListings,
+                activeBookings);
     }
 
     private ListingResponse mapToResponse(

@@ -1,8 +1,5 @@
 <script setup lang="ts">
-type PriceRange = {
-  min: number | null;
-  max: number | null;
-};
+import type { PriceRange } from '~/types/ComponentTypes';
 
 const priceRange = defineModel<PriceRange>({
   required: true,

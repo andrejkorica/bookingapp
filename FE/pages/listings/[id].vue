@@ -3,7 +3,7 @@ import { useAuthStore } from "~/stores/auth";
 import CreateListingImagePreview from "~/components/listings/create/CreateListingImagePreview.vue";
 import ListingLocationMap from "~/components/listings/ListingLocationMap.vue";
 import ListingAvailableUnits from "~/components/listings/ListingAvailableUnits.vue";
-import ListingReviews from "~/components/listings/reviews/ListingReviews.vue";
+import ListingsReviews from "~/components/listings/reviews/ListingsReviews.vue";
 import type { ListingReview } from "~/types/ReviewTypes";
 import type { Listing, ListingUnit } from "~/types/ListingTypes";
 
@@ -20,43 +20,6 @@ const reviews = ref<ListingReview[]>([]);
 const isLoading = ref(false);
 const isLoadingAvailableUnits = ref(false);
 const isSubmittingReview = ref(false);
-
-const reviewSort = ref("newest");
-
-const reviewSortOptions = [
-  { label: "Newest", value: "newest" },
-  { label: "Oldest", value: "oldest" },
-  { label: "Highest rating", value: "highest-rating" },
-  { label: "Lowest rating", value: "lowest-rating" },
-  { label: "Most upvoted", value: "most-upvotes" },
-  { label: "Least upvoted", value: "least-upvotes" },
-];
-
-const sortedReviews = computed(() => {
-  const list = [...reviews.value];
-
-  switch (reviewSort.value) {
-    case "highest-rating":
-      return list.sort((a, b) => b.rating - a.rating);
-    case "lowest-rating":
-      return list.sort((a, b) => a.rating - b.rating);
-    case "most-upvotes":
-      return list.sort((a, b) => b.upvotes - a.upvotes);
-    case "least-upvotes":
-      return list.sort((a, b) => a.upvotes - b.upvotes);
-    case "oldest":
-      return list.sort(
-        (a, b) =>
-          new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
-      );
-    case "newest":
-    default:
-      return list.sort(
-        (a, b) =>
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-      );
-  }
-});
 
 const previewImages = computed(() => {
   return (
@@ -392,7 +355,7 @@ useHead(() => ({
           </div>
         </div>
 
-        <ListingReviews
+        <ListingsReviews
           :reviews="reviews"
           :is-logged-in="Boolean(authStore.user)"
           @submit-review="submitReview"

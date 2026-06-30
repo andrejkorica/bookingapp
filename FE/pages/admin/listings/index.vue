@@ -1,37 +1,22 @@
 <script setup lang="ts">
-import listingRequestCard from '~/components/admin/listingRequestCard.vue'
+import AdminListingRequestCard from '~/components/admin/AdminListingRequestCard.vue'
+import type { Listing } from '~/types/ListingTypes'
 
 definePageMeta({
-  layout: 'admin',
   middleware: 'admin-guard'
 })
-
-type ListingRequest = {
-  id: number
-  title: string
-  location: string
-  description: string
-  lowestPrice: number
-  highestPrice: number
-  rating: number
-  images: string[]
-  amenities: string[]
-  status: string
-  sellerEmail: string
-  createdAt: string
-}
 
 const config = useRuntimeConfig()
 const toast = useToast()
 
-const listings = ref<ListingRequest[]>([])
+const listings = ref<Listing[]>([])
 const isLoading = ref(false)
 
 async function fetchListings() {
   isLoading.value = true
 
   try {
-    listings.value = await $fetch<ListingRequest[]>(
+    listings.value = await $fetch<Listing[]>(
       `${config.public.apiBase}/admin/listings`,
       {
         credentials: 'include'
@@ -52,7 +37,7 @@ async function fetchListings() {
 
 async function approveListing(listingId: number) {
   try {
-    const updatedListing = await $fetch<ListingRequest>(
+    const updatedListing = await $fetch<Listing>(
       `${config.public.apiBase}/admin/listings/${listingId}/approve`,
       {
         method: 'POST',
@@ -82,7 +67,7 @@ async function approveListing(listingId: number) {
 
 async function rejectListing(listingId: number) {
   try {
-    const updatedListing = await $fetch<ListingRequest>(
+    const updatedListing = await $fetch<Listing>(
       `${config.public.apiBase}/admin/listings/${listingId}/reject`,
       {
         method: 'POST',
@@ -148,7 +133,7 @@ onMounted(fetchListings)
         v-else
         class="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3"
       >
-        <listingRequestCard
+        <AdminListingRequestCard
           v-for="listing in listings"
           :key="listing.id"
           :listing="listing"

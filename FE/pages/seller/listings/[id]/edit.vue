@@ -6,6 +6,7 @@ import type {
   Listing,
   ListingUnit,
   PriceAdjustment,
+  ListingImage
 } from "~/types/ListingTypes.js";
 import CreateListingAvailability from "~/components/listings/create/CreateListingAvailability.vue";
 import CreateListingPriceAdjustments from "~/components/listings/create/CreateListingPriceAdjustments.vue";
@@ -14,16 +15,8 @@ import CreateListingImagePreview from "~/components/listings/create/CreateListin
 import CreateListingUnits from "~/components/listings/create/CreateListingUnits.vue";
 
 definePageMeta({
-  layout: "default",
   middleware: "seller-guard",
 });
-
-type ListingImage = {
-  file?: File;
-  previewUrl: string;
-  isUploading: boolean;
-  existingUrl?: string;
-};
 
 const route = useRoute();
 const config = useRuntimeConfig();
@@ -66,11 +59,7 @@ const priceAdjustments = ref<PriceAdjustment[]>([
   },
 ]);
 
-const previewImages = computed(() =>
-  images.value.map((image) => ({
-    previewUrl: image.previewUrl,
-  })),
-);
+const previewImages = computed(() => images.value);
 
 const selectedUnits = computed(() =>
   listingUnits.value.filter(

@@ -1,3 +1,16 @@
+export type PriceAdjustment = {
+  startDate: string;
+  endDate: string;
+  percent: number;
+};
+
+export type ListingImage = {
+  file?: File;
+  previewUrl: string;
+  existingUrl?: string;
+  isUploading?: boolean;
+};
+
 export type ListingUnit = {
   id?: number;
   type: string;
@@ -5,34 +18,44 @@ export type ListingUnit = {
   quantity: number;
   availableQuantity?: number;
   maxGuests?: number;
-  pricePerNight: number;
   roomCount: number;
+  pricePerNight: number;
 };
 
-export type Listing = {
-  id: number;
-  title: string;
+export type ListingLocation = {
   location: string;
   latitude: number | null;
   longitude: number | null;
-  description: string;
-  rating: number;
-  lowestPrice: number;
-  highestPrice: number;
-  averageRating: number;
-  reviewCount: number;
-  images: string[];
-  amenities: string[];
-  availableFrom: string;
-  units: ListingUnit[];
-  priceAdjustments: PriceAdjustment[];
-  status: string;
-  sellerEmail: string;
-  createdAt: string;
 };
 
-export type PriceAdjustment = {
-  startDate: string
-  endDate: string
-  percent: number
-}
+export type ListingPrice = {
+  lowestPrice: number;
+  highestPrice: number;
+};
+
+export type ListingReviews = {
+  rating: number;
+  averageRating: number;
+  reviewCount: number;
+};
+
+export type Listing = ListingLocation &
+  ListingPrice &
+  ListingReviews & {
+    id: number;
+
+    title: string;
+    description: string;
+
+    images: string[];
+    amenities: string[];
+
+    availableFrom: string;
+
+    units: ListingUnit[];
+    priceAdjustments: PriceAdjustment[];
+
+    status: string;
+    sellerEmail: string;
+    createdAt: string;
+  };

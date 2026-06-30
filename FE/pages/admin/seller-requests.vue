@@ -1,24 +1,10 @@
 <script setup lang="ts">
-import sellerRequestCard from '~/components/admin/sellerRequestCard.vue'
+import AdminSellerRequestCard from '~/components/admin/AdminSellerRequestCard.vue'
+import type { SellerRequest } from '~/types/SellerTypes'
 
 definePageMeta({
-  layout: 'admin',
   middleware: 'admin-guard'
 })
-
-type SellerRequest = {
-  id: number
-  requestText: string
-  status: string
-  createdAt: string
-  userName: string
-  userSurname: string
-  userEmail: string
-  businessName: string
-  oib: string
-  iban: string
-  billingAddress: string
-}
 
 const config = useRuntimeConfig()
 const toast = useToast()
@@ -147,7 +133,7 @@ onMounted(fetchRequests)
         v-else
         class="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3"
       >
-        <sellerRequestCard
+        <AdminSellerRequestCard
           v-for="request in requests"
           :key="request.id"
           :request="request"

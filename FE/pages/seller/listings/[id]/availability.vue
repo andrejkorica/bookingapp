@@ -1,39 +1,12 @@
 <script setup lang="ts">
-import SellerBookingCard from "~/components/booking/SellerBookingCard.vue";
+import BookingSellerCard from "~/components/booking/BookingSellerCard.vue";
 import ListingAvailableUnits from "~/components/listings/ListingAvailableUnits.vue";
+import type { UserBooking } from "~/types/BookingTypes";
+import type { ListingUnit } from "~/types/ListingTypes";
 
 definePageMeta({
-  layout: "default",
   middleware: "seller-guard",
 });
-
-type BookingStatus = "PENDING" | "CONFIRMED" | "CANCELLED";
-
-type UserBooking = {
-  id: number;
-  listingId: number;
-  listingTitle: string;
-  listingLocation: string;
-  listingImage: string | null;
-  unitLabel: string;
-  checkIn: string;
-  checkOut: string;
-  nights: number;
-  pricePerNight: number;
-  totalPrice: number;
-  status: BookingStatus;
-  createdAt: string;
-};
-
-type ListingUnit = {
-  id?: number;
-  type: string;
-  label: string;
-  quantity: number;
-  availableQuantity?: number;
-  maxGuests?: number;
-  pricePerNight: number;
-};
 
 const route = useRoute();
 const router = useRouter();
@@ -45,6 +18,8 @@ const availableUnits = ref<ListingUnit[]>([]);
 
 const isLoading = ref(false);
 const isLoadingAvailableUnits = ref(false);
+
+const availableUnitsOpen = ref(true);
 
 async function fetchBookings() {
   isLoading.value = true;
@@ -94,10 +69,13 @@ async function fetchAvailableUnits() {
 
 async function approveBooking(bookingId: number) {
   try {
-    await $fetch(`${config.public.apiBase}/bookings/seller/${bookingId}/approve`, {
-      method: "POST",
-      credentials: "include",
-    });
+    await $fetch(
+      `${config.public.apiBase}/bookings/seller/${bookingId}/approve`,
+      {
+        method: "POST",
+        credentials: "include",
+      },
+    );
 
     toast.add({
       title: "Booking approved",
@@ -119,10 +97,13 @@ async function approveBooking(bookingId: number) {
 
 async function rejectBooking(bookingId: number) {
   try {
-    await $fetch(`${config.public.apiBase}/bookings/seller/${bookingId}/reject`, {
-      method: "POST",
-      credentials: "include",
-    });
+    await $fetch(
+      `${config.public.apiBase}/bookings/seller/${bookingId}/reject`,
+      {
+        method: "POST",
+        credentials: "include",
+      },
+    );
 
     toast.add({
       title: "Booking rejected",
@@ -177,18 +158,32 @@ onMounted(async () => {
       </div>
 
       <UCard class="mb-6">
-        <div
-          v-if="isLoadingAvailableUnits"
-          class="py-8 text-center text-slate-500"
-        >
-          Loading available units...
-        </div>
+        <UCollapsible v-model:open="availableUnitsOpen">
+          <UButton
+            label="Available units"
+            color="neutral"
+            variant="ghost"
+            trailing-icon="i-lucide-chevron-down"
+            block
+            class="justify-between px-0 py-0 text-xl font-semibold hover:bg-transparent active:bg-transparent focus:bg-transparent focus-visible:ring-0"
+            :ui="{
+              base: 'hover:bg-transparent active:bg-transparent focus:bg-transparent focus-visible:ring-0',
+            }"
+          />
 
-        <ListingAvailableUnits
-          v-else
-          :units="availableUnits"
-          title="Available units"
-        />
+          <template #content>
+            <div class="pt-4">
+              <div
+                v-if="isLoadingAvailableUnits"
+                class="py-8 text-center text-slate-500"
+              >
+                Loading available units...
+              </div>
+
+              <ListingAvailableUnits v-else :units="availableUnits" title="" />
+            </div>
+          </template>
+        </UCollapsible>
       </UCard>
 
       <UCard>
@@ -214,7 +209,7 @@ onMounted(async () => {
         </div>
 
         <div v-else class="space-y-4">
-          <SellerBookingCard
+          <BookingSellerCard
             v-for="booking in bookings"
             :key="booking.id"
             :booking="booking"

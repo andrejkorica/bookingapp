@@ -16,8 +16,13 @@ const form = reactive({
 })
 
 const isSeller = computed(() => authStore.user?.role === 'SELLER')
+const isAdmin = computed(() => authStore.user?.role === 'ADMIN')
 
 async function sendSellerRequest() {
+  if (isAdmin.value) {
+    return
+  }
+
   isSending.value = true
 
   try {
@@ -48,7 +53,29 @@ async function sendSellerRequest() {
 
 <template>
   <div class="space-y-6">
-    <template v-if="isSeller">
+    <template v-if="isAdmin">
+      <div class="mx-auto max-w-md">
+        <UCard>
+          <div class="flex flex-col items-center py-8 text-center">
+            <UIcon
+              name="i-lucide-lock"
+              class="mb-4 size-12 text-slate-400"
+            />
+
+            <h2 class="text-xl font-semibold">
+              Seller Information Locked
+            </h2>
+
+            <p class="mt-2 text-sm text-slate-600">
+              Administrator accounts cannot become sellers or submit seller
+              requests.
+            </p>
+          </div>
+        </UCard>
+      </div>
+    </template>
+
+    <template v-else-if="isSeller">
       <div class="text-center">
         <h2 class="text-xl font-semibold">
           Seller Info
@@ -67,8 +94,8 @@ async function sendSellerRequest() {
         </h2>
 
         <p class="mx-auto mt-1 max-w-md text-sm text-slate-600">
-          Fill in your billing information and send a request to become a seller.
-          An admin needs to approve your request first.
+          Fill in your billing information and send a request to become a
+          seller. An admin needs to approve your request first.
         </p>
       </div>
 

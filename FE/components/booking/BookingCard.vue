@@ -1,26 +1,5 @@
 <script setup lang="ts">
-type BookingStatus = "PENDING" | "CONFIRMED" | "CANCELLED";
-
-type UserBooking = {
-  id: number;
-  listingId: number;
-  listingTitle: string;
-  listingLocation: string;
-  listingImage: string | null;
-
-  unitType: string;
-  unitLabel: string;
-
-  checkIn: string;
-  checkOut: string;
-  nights: number;
-
-  pricePerNight: number;
-  totalPrice: number;
-
-  status: BookingStatus;
-  createdAt: string;
-};
+import type { UserBooking } from '~/types/BookingTypes';
 
 const props = defineProps<{
   booking: UserBooking;
@@ -55,11 +34,6 @@ const canCancel = computed(() => {
   return diffDays > 1;
 });
 
-const cancelLabel = computed(() => {
-  if (props.booking.status === "CANCELLED") return "Cancelled";
-  if (!canCancel.value) return "Too late";
-  return "Cancel";
-});
 
 function confirmCancel() {
   emit("cancel", props.booking.id);

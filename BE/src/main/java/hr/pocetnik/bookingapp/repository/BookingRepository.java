@@ -7,7 +7,9 @@ import hr.pocetnik.bookingapp.model.ListingEntity;
 import hr.pocetnik.bookingapp.model.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -39,4 +41,20 @@ public interface BookingRepository extends JpaRepository<BookingEntity, Long> {
             BookingStatus status,
             LocalDate checkOut,
             LocalDate checkIn);
+
+    @Query("""
+                select coalesce(sum(b.totalPrice), 0)
+                from BookingEntity b
+                where b.listing.seller = :seller
+                and b.status = hr.pocetnik.bookingapp.enums.BookingStatus.CONFIRMED
+            """)
+    BigDecimal findTotalEarningsBySeller(@Param("seller") UserEntity seller);
+
+    @Query("""
+                select count(b)
+                from BookingEntity b
+                where b.listing.seller = :seller
+                and b.status = hr.pocetnik.bookingapp.enums.BookingStatus.CONFIRMED
+            """)
+    Long countActiveBookingsBySeller(@Param("seller") UserEntity seller);
 }

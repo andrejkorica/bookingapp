@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import type { DateValue } from "@internationalized/date";
 import { getLocalTimeZone, parseDate } from "@internationalized/date";
 import BookingSteps from "~/components/booking/BookingSteps.vue";
 import BookingUnitSelector from "~/components/booking/BookingUnitSelector.vue";
@@ -8,43 +7,8 @@ import BookingPriceSummary from "~/components/booking/BookingPriceSummary.vue";
 import BookingGuestInfo from "~/components/booking/BookingGuestInfo.vue";
 import BookingPaymentForm from "~/components/booking/BookingPaymentForm.vue";
 import type { BookedRange } from "~/types/BookingTypes";
-
-definePageMeta({
-  layout: "default",
-});
-
-type DateRangeValue = {
-  start: DateValue | undefined;
-  end: DateValue | undefined;
-};
-
-type ListingUnit = {
-  id?: number;
-  type: string;
-  label: string;
-  quantity: number;
-  availableQuantity?: number;
-  maxGuests?: number;
-  pricePerNight: number;
-};
-
-type PriceAdjustment = {
-  id: number;
-  startDate: string;
-  endDate: string;
-  percent: number;
-};
-
-type Listing = {
-  id: number;
-  title: string;
-  location: string;
-  latitude: number | null;
-  longitude: number | null;
-  availableFrom: string;
-  units: ListingUnit[];
-  priceAdjustments: PriceAdjustment[];
-};
+import type { Listing, ListingUnit, PriceAdjustment } from "~/types/ListingTypes";
+import type { DateRangeValue } from "~/types/ComponentTypes";
 
 const route = useRoute();
 const config = useRuntimeConfig();
@@ -91,6 +55,18 @@ const paymentInfo = reactive({
   confirmedInfoCorrect: false,
 });
 
+const listingLocation = computed(() => {
+  if (!listing.value) {
+    return null;
+  }
+
+  return {
+    location: listing.value.location,
+    latitude: listing.value.latitude,
+    longitude: listing.value.longitude,
+  };
+});
+
 async function fetchBookedRanges(listingId: number) {
   try {
     bookedRanges.value = await $fetch<BookedRange[]>(
@@ -120,7 +96,7 @@ const availableFromDate = computed(() => {
   return parseDate(listing.value.availableFrom);
 });
 
-const unitOptions = computed(() => {
+const unitOptions = computed<ListingUnit[]>(() => {
   const sourceUnits = availableUnits.value.length
     ? availableUnits.value
     : (listing.value?.units ?? []);
@@ -135,14 +111,17 @@ const unitOptions = computed(() => {
       return quantity > 0;
     })
     .map((unit) => ({
-      value: unit.type,
+      id: unit.id,
+      type: unit.type,
       label: unit.label,
       pricePerNight: Number(unit.pricePerNight),
       quantity:
         unit.availableQuantity !== undefined
           ? Number(unit.availableQuantity)
           : Number(unit.quantity),
+      availableQuantity: unit.availableQuantity,
       maxGuests: unit.maxGuests,
+      roomCount: unit.roomCount,
     }));
 });
 
@@ -150,7 +129,7 @@ const selectedUnitItems = computed(() => {
   return unitOptions.value
     .map((unit) => ({
       ...unit,
-      selectedQuantity: selectedUnits.value[unit.value] ?? 0,
+      selectedQuantity: selectedUnits.value[unit.type] ?? 0,
     }))
     .filter((unit) => unit.selectedQuantity > 0);
 });
@@ -352,7 +331,7 @@ async function confirmBooking() {
         listingId: listing.value.id,
 
         units: selectedUnitItems.value.map((unit) => ({
-          unitType: unit.value,
+          unitType: unit.type,
           quantity: unit.selectedQuantity,
         })),
 
@@ -457,7 +436,7 @@ onMounted(fetchListing);
         <div v-else-if="step === 2">
           <BookingGuestInfo
             v-model="guestInfo"
-            :listing="listing"
+            :location="listingLocation"
             @back="goBackToDates"
             @continue="goToPayment"
           />

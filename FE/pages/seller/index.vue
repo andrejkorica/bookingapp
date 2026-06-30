@@ -1,31 +1,72 @@
 <script setup lang="ts">
-import { useAuthStore } from '~/stores/auth'
+import { useAuthStore } from "~/stores/auth";
 
 definePageMeta({
-  layout: 'default',
-  middleware: 'seller-guard'
-})
+  middleware: "seller-guard",
+});
 
-const authStore = useAuthStore()
+type SellerDashboardStats = {
+  totalEarnings: number;
+  totalListings: number;
+  activeBookings: number;
+};
+
+const authStore = useAuthStore();
+const config = useRuntimeConfig();
+
+const stats = ref<SellerDashboardStats>({
+  totalEarnings: 0,
+  totalListings: 0,
+  activeBookings: 0,
+});
+
+const isLoadingStats = ref(false);
 
 const actionCardUi = {
-  root: 'flex h-full flex-col',
-  body: 'flex-1',
-  footer: 'shrink-0'
+  root: "flex h-full flex-col",
+  body: "flex-1",
+  footer: "shrink-0",
+};
+
+async function fetchDashboardStats() {
+  isLoadingStats.value = true;
+
+  try {
+    stats.value = await $fetch<SellerDashboardStats>(
+      `${config.public.apiBase}/seller/dashboard-stats`,
+      {
+        credentials: "include",
+      },
+    );
+  } catch (error) {
+    console.error(error);
+  } finally {
+    isLoadingStats.value = false;
+  }
 }
+
+const formattedEarnings = computed(() => {
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "EUR",
+  }).format(stats.value.totalEarnings);
+});
+
+onMounted(fetchDashboardStats);
 </script>
 
 <template>
   <div class="min-h-screen bg-slate-50">
     <div class="container mx-auto px-4 py-10">
       <div class="mb-8">
-        <h1 class="text-3xl font-bold text-slate-900">
-          Seller Dashboard
-        </h1>
+        <h1 class="text-3xl font-bold text-slate-900">Seller Dashboard</h1>
 
-        <p class="mt-2 text-slate-600">
-          Welcome back, {{ authStore.user?.name }}. Manage your listings and track your seller activity.
-        </p>
+        <ClientOnly>
+          <p class="mt-2 text-slate-600">
+            Welcome back, {{ authStore.user?.name }}. Manage your listings and
+            track your seller activity.
+          </p>
+        </ClientOnly>
       </div>
 
       <div class="mb-8 grid gap-6 md:grid-cols-3">
@@ -33,7 +74,9 @@ const actionCardUi = {
           <div class="flex items-center justify-between">
             <div>
               <p class="text-sm text-slate-500">Total Earnings</p>
-              <p class="mt-2 text-3xl font-bold text-slate-900">€0.00</p>
+              <p class="mt-2 text-3xl font-bold text-slate-900">
+                {{ isLoadingStats ? "..." : formattedEarnings }}
+              </p>
             </div>
 
             <UIcon name="i-lucide-euro" class="size-8 text-slate-400" />
@@ -44,7 +87,9 @@ const actionCardUi = {
           <div class="flex items-center justify-between">
             <div>
               <p class="text-sm text-slate-500">Total Listings</p>
-              <p class="mt-2 text-3xl font-bold text-slate-900">0</p>
+              <p class="mt-2 text-3xl font-bold text-slate-900">
+                {{ isLoadingStats ? "..." : stats.totalListings }}
+              </p>
             </div>
 
             <UIcon name="i-lucide-building-2" class="size-8 text-slate-400" />
@@ -55,10 +100,15 @@ const actionCardUi = {
           <div class="flex items-center justify-between">
             <div>
               <p class="text-sm text-slate-500">Active Bookings</p>
-              <p class="mt-2 text-3xl font-bold text-slate-900">0</p>
+              <p class="mt-2 text-3xl font-bold text-slate-900">
+                {{ isLoadingStats ? "..." : stats.activeBookings }}
+              </p>
             </div>
 
-            <UIcon name="i-lucide-calendar-check" class="size-8 text-slate-400" />
+            <UIcon
+              name="i-lucide-calendar-check"
+              class="size-8 text-slate-400"
+            />
           </div>
         </UCard>
       </div>
@@ -90,7 +140,8 @@ const actionCardUi = {
           </template>
 
           <p class="text-sm text-slate-600">
-            Edit listing details, update pricing, manage availability, and temporarily disable bookings during renovations or maintenance.
+            Edit listing details, update pricing, manage availability, and
+            temporarily disable bookings during renovations or maintenance.
           </p>
 
           <template #footer>
@@ -103,8 +154,6 @@ const actionCardUi = {
             />
           </template>
         </UCard>
-
-
       </div>
     </div>
   </div>

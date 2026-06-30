@@ -2,10 +2,8 @@
 import { useAuthStore } from '~/stores/auth'
 
 definePageMeta({
-  layout: 'admin',
   middleware: 'admin-guard'
 })
-
 
 const authStore = useAuthStore()
 </script>
@@ -40,7 +38,7 @@ const authStore = useAuthStore()
               label="View Requests"
               variant="soft"
               color="neutral"
-              to="/admin/sellerRequests"
+              to="/admin/seller-requests"
               
             />
           </template>

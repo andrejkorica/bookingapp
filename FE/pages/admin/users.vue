@@ -1,20 +1,11 @@
 <script setup lang="ts">
-import editUserModal from '~/components/admin/editUserModal.vue'
-import deleteUserModal from '~/components/admin/deleteUserModal.vue'
+import AdminEditUserModal from '~/components/admin/AdminEditUserModal.vue'
+import AdminDeleteUserModal from '~/components/admin/AdminDeleteUserModal.vue'
+import type { User } from '~/types/UserTypes'
 
 definePageMeta({
-  layout: 'admin',
   middleware: 'admin-guard'
 })
-
-type User = {
-  id: number
-  name: string
-  surname: string
-  email: string
-  phoneNumber: string
-  role: string
-}
 
 const config = useRuntimeConfig()
 const toast = useToast()
@@ -143,13 +134,13 @@ onMounted(fetchUsers)
       </div>
     </UCard>
 
-    <editUserModal
+    <AdminEditUserModal
       v-model:open="editModalOpen"
       :user="selectedUser"
       @updated="handleUserUpdated"
     />
 
-    <deleteUserModal
+    <AdminDeleteUserModal
       v-model:open="deleteModalOpen"
       :user="selectedUser"
       @deleted="handleUserDeleted"

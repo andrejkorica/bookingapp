@@ -3,6 +3,7 @@ package hr.pocetnik.bookingapp.controller;
 import hr.pocetnik.bookingapp.dto.listing.ListingAvailableUnitResponse;
 import hr.pocetnik.bookingapp.dto.listing.ListingRequest;
 import hr.pocetnik.bookingapp.dto.listing.ListingResponse;
+import hr.pocetnik.bookingapp.dto.seller.SellerStatisticsResponse;
 import hr.pocetnik.bookingapp.service.ListingService;
 
 import org.springframework.http.ResponseEntity;
@@ -112,6 +113,13 @@ public class ListingController {
     @GetMapping("/listings/amenities")
     public ResponseEntity<List<String>> getAmenities() {
         return ResponseEntity.ok(listingService.getAmenities());
+    }
+
+    @GetMapping("/seller/dashboard-stats")
+    public SellerStatisticsResponse getSellerDashboardStats(Authentication authentication) {
+        String email = authentication.getName();
+
+        return listingService.getSellerDashboardStats(email);
     }
 
 }

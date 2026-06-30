@@ -6,6 +6,7 @@ import java.util.List;
 import hr.pocetnik.bookingapp.dto.listing.ListingAvailableUnitResponse;
 import hr.pocetnik.bookingapp.dto.listing.ListingRequest;
 import hr.pocetnik.bookingapp.dto.listing.ListingResponse;
+import hr.pocetnik.bookingapp.dto.seller.SellerStatisticsResponse;
 
 public interface ListingService {
 
@@ -49,5 +50,7 @@ public interface ListingService {
                         String sort);
 
         List<String> getAmenities();
+
+        SellerStatisticsResponse getSellerDashboardStats(String sellerEmail);
 
 }

@@ -1,3 +1,72 @@
+<script setup lang="ts">
+import * as v from "valibot";
+import { reactive } from "vue";
+import type { FormSubmitEvent } from "#ui/types";
+import { useAuthStore } from "~/stores/auth";
+
+definePageMeta({
+  layout: "auth",
+});
+
+const config = useRuntimeConfig();
+
+const schema = v.object({
+  email: v.pipe(
+    v.string(),
+    v.email("Invalid email"),
+    v.nonEmpty("Please enter your email"),
+  ),
+  password: v.pipe(
+    v.string(),
+    v.minLength(8, "Must be at least 8 characters long."),
+    v.nonEmpty("Please enter your password"),
+  ),
+});
+
+type Schema = v.InferOutput<typeof schema>;
+
+const toast = useToast();
+async function onSubmitLogin(event: FormSubmitEvent<Schema>) {
+  const auth = useAuthStore();
+
+  try {
+    const { email, password } = event.data;
+
+    await $fetch(`${config.public.apiBase}/users/login`, {
+      method: "POST",
+      body: { email, password },
+      credentials: "include",
+    });
+
+    await auth.fetchUser();
+
+    toast.add({
+      title: "Success",
+      description: "Logged in successfully!",
+      color: "success",
+    });
+
+    if (auth.user?.role === "ADMIN") {
+      await navigateTo("/admin");
+    } else {
+      await navigateTo("/");
+    }
+  } catch (err: any) {
+    toast.add({
+      title: "Login failed",
+      description: err?.data?.message || "Invalid email or password",
+      color: "error",
+    });
+  }
+}
+
+const state = reactive({
+  email: "",
+  password: "",
+});
+</script>
+
+
 <template>
   <div
     class="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 via-white to-slate-100">
@@ -84,70 +153,3 @@
   </div>
 </template>
 
-<script setup lang="ts">
-import * as v from "valibot";
-import { reactive } from "vue";
-import type { FormSubmitEvent } from "#ui/types";
-import { useAuthStore } from "~/stores/auth";
-const config = useRuntimeConfig();
-
-definePageMeta({
-layout: false
-  
-})
-
-const schema = v.object({
-  email: v.pipe(
-    v.string(),
-    v.email("Invalid email"),
-    v.nonEmpty("Please enter your email"),
-  ),
-  password: v.pipe(
-    v.string(),
-    v.minLength(8, "Must be at least 8 characters long."),
-    v.nonEmpty("Please enter your password"),
-  ),
-});
-
-type Schema = v.InferOutput<typeof schema>;
-
-const toast = useToast();
-async function onSubmitLogin(event: FormSubmitEvent<Schema>) {
-  const auth = useAuthStore();
-
-  try {
-    const { email, password } = event.data;
-
-    await $fetch(`${config.public.apiBase}/users/login`, {
-      method: "POST",
-      body: { email, password },
-      credentials: "include",
-    });
-
-    await auth.fetchUser();
-
-    toast.add({
-      title: "Success",
-      description: "Logged in successfully!",
-      color: "success",
-    });
-
-    if (auth.user?.role === "ADMIN") {
-      await navigateTo("/admin");
-    } else {
-      await navigateTo("/");
-    }
-  } catch (err: any) {
-    toast.add({
-      title: "Login failed",
-      description: err?.data?.message || "Invalid email or password",
-      color: "error",
-    });
-  }
-}
-
-const state = reactive({
-  email: "",
-  password: "",
-});
-</script>

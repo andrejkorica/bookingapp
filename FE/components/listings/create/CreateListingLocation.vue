@@ -1,11 +1,6 @@
 <script setup lang="ts">
 import "leaflet/dist/leaflet.css";
-
-type LocationSuggestion = {
-  display_name: string;
-  lat: string;
-  lon: string;
-};
+import type { LocationSuggestion } from "~/types/ComponentTypes";
 
 const location = defineModel<string>("location", { default: "" });
 const latitude = defineModel<number | null>("latitude", { default: null });
@@ -60,9 +55,9 @@ async function fetchSuggestions() {
           format: "json",
           limit: 5,
           addressdetails: 1,
-          countrycodes: "hr"
-        }
-      }
+          countrycodes: "hr",
+        },
+      },
     );
 
     isSuggestionsOpen.value = suggestions.value.length > 0;
@@ -101,7 +96,6 @@ async function searchFirstSuggestion() {
   await fetchSuggestions();
 }
 
-
 onMounted(async () => {
   await nextTick();
 
@@ -115,7 +109,7 @@ onMounted(async () => {
   map = L.map(mapEl.value).setView([defaultLat, defaultLng], 13);
 
   L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-    attribution: "&copy; OpenStreetMap contributors"
+    attribution: "&copy; OpenStreetMap contributors",
   }).addTo(map);
 
   map.on("click", (event: any) => {

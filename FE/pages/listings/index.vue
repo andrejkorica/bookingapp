@@ -5,10 +5,6 @@ import ListingCard from "~/components/listings/ListingCard.vue";
 import FilteringSortDropdown from "~/components/filtering/FilteringSortDropdown.vue";
 import type { Listing } from "~/types/ListingTypes";
 
-definePageMeta({
-  layout: "default",
-});
-
 const sort = ref("top");
 
 const config = useRuntimeConfig();

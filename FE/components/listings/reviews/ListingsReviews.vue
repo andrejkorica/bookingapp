@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import ListingReviewCard from "~/components/listings/reviews/ListingReviewCard.vue";
+import ListingsReviewCard from "~/components/listings/reviews/ListingsReviewCard.vue";
 import type { ListingReview } from "~/types/ReviewTypes";
 
 const props = defineProps<{
@@ -142,7 +142,7 @@ function handleVote(reviewId: number, voteType: "UP" | "DOWN") {
     </div>
 
     <div v-else class="space-y-4">
-      <ListingReviewCard
+      <ListingsReviewCard
         v-for="review in sortedReviews"
         :key="review.id"
         :review="review"

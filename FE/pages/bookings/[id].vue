@@ -1,55 +1,5 @@
 <script setup lang="ts">
-definePageMeta({
-  layout: "default",
-});
-
-type BookingStatus = "PENDING" | "CONFIRMED" | "CANCELLED";
-
-type BookingUnit = {
-  unitType: string;
-  unitLabel: string;
-  quantity: number;
-};
-
-type BookingDetails = {
-  id: number;
-
-  listingId: number;
-  listingTitle: string;
-  listingLocation: string;
-  listingImage: string | null;
-
-  units: BookingUnit[];
-
-  checkIn: string;
-  checkOut: string;
-  nights: number;
-
-  pricePerNight: number;
-  totalPrice: number;
-
-  guestName: string;
-  guestSurname: string;
-  guestEmail: string;
-  guestPhoneNumber: string;
-
-  travelPurpose: string;
-  arrivalTime: string;
-  arrivalMethod: string;
-  specialRequests: string;
-  hasPets: boolean;
-  needsParking: boolean;
-  accessibilityRequirements: string;
-
-  billingAddress: string;
-
-  agreedToRules: boolean;
-  agreedToCancellationPolicy: boolean;
-  confirmedInfoCorrect: boolean;
-
-  status: BookingStatus;
-  createdAt: string;
-};
+import type { BookingDetails } from "~/types/BookingTypes";
 
 const route = useRoute();
 const router = useRouter();
@@ -73,7 +23,7 @@ async function fetchBooking() {
       `${config.public.apiBase}/bookings/${route.params.id}`,
       {
         credentials: "include",
-      }
+      },
     );
   } catch (error) {
     console.error(error);
@@ -200,9 +150,7 @@ onMounted(fetchBooking);
                   </p>
                 </div>
 
-                <p class="font-bold">
-                  × {{ unit.quantity }}
-                </p>
+                <p class="font-bold">× {{ unit.quantity }}</p>
               </div>
             </div>
           </UCard>
@@ -232,17 +180,23 @@ onMounted(fetchBooking);
 
               <div>
                 <p class="text-slate-500">Travel purpose</p>
-                <p class="font-medium">{{ booking.travelPurpose || "Not specified" }}</p>
+                <p class="font-medium">
+                  {{ booking.travelPurpose || "Not specified" }}
+                </p>
               </div>
 
               <div>
                 <p class="text-slate-500">Arrival time</p>
-                <p class="font-medium">{{ booking.arrivalTime || "Not specified" }}</p>
+                <p class="font-medium">
+                  {{ booking.arrivalTime || "Not specified" }}
+                </p>
               </div>
 
               <div>
                 <p class="text-slate-500">Arrival method</p>
-                <p class="font-medium">{{ booking.arrivalMethod || "Not specified" }}</p>
+                <p class="font-medium">
+                  {{ booking.arrivalMethod || "Not specified" }}
+                </p>
               </div>
             </div>
           </UCard>
@@ -268,11 +222,17 @@ onMounted(fetchBooking);
               </div>
 
               <div class="flex flex-wrap gap-3">
-                <UBadge :color="booking.hasPets ? 'success' : 'neutral'" variant="soft">
+                <UBadge
+                  :color="booking.hasPets ? 'success' : 'neutral'"
+                  variant="soft"
+                >
                   Pets: {{ booking.hasPets ? "Yes" : "No" }}
                 </UBadge>
 
-                <UBadge :color="booking.needsParking ? 'success' : 'neutral'" variant="soft">
+                <UBadge
+                  :color="booking.needsParking ? 'success' : 'neutral'"
+                  variant="soft"
+                >
                   Parking: {{ booking.needsParking ? "Yes" : "No" }}
                 </UBadge>
               </div>
@@ -324,12 +284,16 @@ onMounted(fetchBooking);
 
               <p>
                 Cancellation policy accepted:
-                <strong>{{ booking.agreedToCancellationPolicy ? "Yes" : "No" }}</strong>
+                <strong>{{
+                  booking.agreedToCancellationPolicy ? "Yes" : "No"
+                }}</strong>
               </p>
 
               <p>
                 Info confirmed correct:
-                <strong>{{ booking.confirmedInfoCorrect ? "Yes" : "No" }}</strong>
+                <strong>{{
+                  booking.confirmedInfoCorrect ? "Yes" : "No"
+                }}</strong>
               </p>
             </div>
           </UCard>

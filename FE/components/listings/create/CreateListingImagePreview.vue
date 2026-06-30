@@ -1,12 +1,9 @@
 <script setup lang="ts">
 import CreateListingImageGalleryModal from "./CreateListingImageGalleryModal.vue";
-
-type ListingImagePreview = {
-  previewUrl: string;
-};
+import type { ListingImage } from "~/types/ListingTypes.js";
 
 const props = defineProps<{
-  images: ListingImagePreview[];
+  images: ListingImage[];
 }>();
 
 const isGalleryOpen = ref(false);

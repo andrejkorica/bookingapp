@@ -2,40 +2,12 @@
 import CreateListingImagePreview from "~/components/listings/create/CreateListingImagePreview.vue";
 import ListingLocationMap from "../../../components/listings/ListingLocationMap.vue";
 import ListingAvailableUnits from "../../../components/listings/ListingAvailableUnits.vue";
+import type { Listing } from "~/types/ListingTypes.js";
 
 definePageMeta({
-  layout: "admin",
+
   middleware: "admin-guard",
 });
-
-type ListingUnit = {
-  id?: number;
-  type: string;
-  label: string;
-  quantity: number;
-  availableQuantity?: number;
-  maxGuests?: number;
-  pricePerNight: number;
-};
-
-type Listing = {
-  id: number;
-  title: string;
-  location: string;
-  description: string;
-  lowestPrice: number;
-  highestPrice: number;
-  rating: number;
-  images: string[];
-  amenities: string[];
-  availableFrom: string;
-  units: ListingUnit[];
-  status: string;
-  sellerEmail: string;
-  createdAt: string;
-  latitude: number | null;
-  longitude: number | null;
-};
 
 const route = useRoute();
 const config = useRuntimeConfig();
@@ -48,10 +20,11 @@ const previewImages = computed(() => {
   return (
     listing.value?.images.map((image) => ({
       previewUrl: image,
+      existingUrl: image,
+      isUploading: false,
     })) ?? []
   );
 });
-
 const priceLabel = computed(() => {
   if (!listing.value) {
     return "Price not set";

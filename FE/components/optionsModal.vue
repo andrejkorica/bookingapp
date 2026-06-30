@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { TabsItem } from '@nuxt/ui'
-import SellerTab from './options/sellerTab.vue'
-import ProfileTab from './options/profileTab.vue'
+import SellerTab from './options/OptionsSellerTab.vue'
+import ProfileTab from './options/OptionsProfileTab.vue'
 
 const isOpen = defineModel<boolean>('open', {
   default: false

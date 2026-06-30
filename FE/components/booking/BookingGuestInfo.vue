@@ -1,15 +1,11 @@
 <script setup lang="ts">
 const config = useRuntimeConfig();
 import ListingLocationMap from "~/components/listings/ListingLocationMap.vue";
-
-type BookingListing = {
-  location: string;
-  latitude: number | null;
-  longitude: number | null;
-};
+import type { ListingLocation } from "~/types/ListingTypes";
+import type { User } from "~/types/UserTypes";
 
 defineProps<{
-  listing: BookingListing | null;
+  location: ListingLocation | null;
 }>();
 
 const guestInfo = defineModel<{
@@ -53,16 +49,9 @@ const canContinue = computed(() => {
   );
 });
 
-type CurrentUser = {
-  name: string;
-  surname: string;
-  email: string;
-  phoneNumber: string;
-};
-
 async function fetchCurrentUser() {
   try {
-    const user = await $fetch<CurrentUser>(
+    const user = await $fetch<User>(
       `${config.public.apiBase}/users/me`,
       {
         credentials: "include",
@@ -184,10 +173,10 @@ onMounted(fetchCurrentUser);
       </template>
 
       <ListingLocationMap
-        v-if="listing"
-        :location="listing.location"
-        :latitude="listing.latitude"
-        :longitude="listing.longitude"
+        v-if="location"
+        :location="location.location"
+        :latitude="location.latitude"
+        :longitude="location.longitude"
       />
     </UCard>
 

@@ -1,12 +1,5 @@
 <script setup lang="ts">
-type User = {
-  id: number;
-  name: string;
-  surname: string;
-  email: string;
-  phoneNumber: string;
-  role: string;
-};
+import type { User } from '~/types/UserTypes';
 
 const open = defineModel<boolean>("open", {
   default: false,

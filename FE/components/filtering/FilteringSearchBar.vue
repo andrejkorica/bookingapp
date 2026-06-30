@@ -5,10 +5,8 @@ import {
   parseDate,
 } from "@internationalized/date";
 
-import type { DateRangeValue } from "~/types/FilteringTypes" 
-
 import FilteringGuestSelector from "~/components/filtering/FilteringGuestSelector.vue";
-
+import type { DateRangeValue } from "~/types/ComponentTypes";
 
 
 const config = useRuntimeConfig();

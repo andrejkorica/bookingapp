@@ -1,13 +1,8 @@
 <script setup lang="ts">
 import { breakpointsTailwind, useBreakpoints } from '@vueuse/core'
 import { DateFormatter, getLocalTimeZone, parseDate } from '@internationalized/date'
-import type { DateValue } from '@internationalized/date'
 import type { PriceAdjustment } from "~/types/ListingTypes"
-
-type DateRangeValue = {
-  start: DateValue | undefined
-  end: DateValue | undefined
-}
+import type { DateRangeValue } from '~/types/ComponentTypes'
 
 const priceAdjustments = defineModel<PriceAdjustment[]>({
   required: true

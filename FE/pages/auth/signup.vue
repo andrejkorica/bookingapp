@@ -1,3 +1,68 @@
+<script setup lang="ts">
+import { reactive } from "vue";
+import type { FormSubmitEvent } from "#ui/types";
+import { useAuthStore } from "~/stores/auth";
+
+const config = useRuntimeConfig();
+const toast = useToast();
+const auth = useAuthStore();
+
+definePageMeta({
+  layout: "auth",
+});
+
+const state = reactive({
+  name: "",
+  surname: "",
+  phoneNumber: "",
+  email: "",
+  password: "",
+  passwordConfirm: "",
+});
+
+async function onSubmit(event: FormSubmitEvent<any>) {
+  if (event.data.password !== event.data.passwordConfirm) {
+    toast.add({
+      title: "Error",
+      description: "Passwords do not match",
+      color: "error",
+    });
+    return;
+  }
+
+  try {
+    await $fetch(`${config.public.apiBase}/users/register`, {
+      method: "POST",
+      body: {
+        name: event.data.name,
+        surname: event.data.surname,
+        phoneNumber: event.data.phoneNumber,
+        email: event.data.email,
+        password: event.data.password,
+      },
+      credentials: "include",
+    });
+
+    await auth.fetchUser();
+
+    toast.add({
+      title: "Success",
+      description: "Account created successfully!",
+      color: "success",
+    });
+
+    await navigateTo("/");
+  } catch (err: any) {
+    toast.add({
+      title: "Registration failed",
+      description: err?.data?.message || "Unable to create account",
+      color: "error",
+    });
+  }
+}
+</script>
+
+
 <template>
   <div
     class="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 via-white to-slate-100 py-12">
@@ -97,66 +162,3 @@
   </div>
 </template>
 
-<script setup lang="ts">
-import { reactive } from "vue";
-import type { FormSubmitEvent } from "#ui/types";
-import { useAuthStore } from "~/stores/auth";
-
-definePageMeta({
-  layout: false,
-});
-
-const config = useRuntimeConfig();
-const toast = useToast();
-const auth = useAuthStore();
-
-const state = reactive({
-  name: "",
-  surname: "",
-  phoneNumber: "",
-  email: "",
-  password: "",
-  passwordConfirm: "",
-});
-
-async function onSubmit(event: FormSubmitEvent<any>) {
-  if (event.data.password !== event.data.passwordConfirm) {
-    toast.add({
-      title: "Error",
-      description: "Passwords do not match",
-      color: "error",
-    });
-    return;
-  }
-
-  try {
-    await $fetch(`${config.public.apiBase}/users/register`, {
-      method: "POST",
-      body: {
-        name: event.data.name,
-        surname: event.data.surname,
-        phoneNumber: event.data.phoneNumber,
-        email: event.data.email,
-        password: event.data.password,
-      },
-      credentials: "include",
-    });
-
-    await auth.fetchUser();
-
-    toast.add({
-      title: "Success",
-      description: "Account created successfully!",
-      color: "success",
-    });
-
-    await navigateTo("/");
-  } catch (err: any) {
-    toast.add({
-      title: "Registration failed",
-      description: err?.data?.message || "Unable to create account",
-      color: "error",
-    });
-  }
-}
-</script>

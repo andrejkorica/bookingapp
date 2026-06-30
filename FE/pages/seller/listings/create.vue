@@ -1,25 +1,19 @@
 <script setup lang="ts">
 import type { DateValue } from "@internationalized/date";
 import { today, getLocalTimeZone } from "@internationalized/date";
-import { unitTypes } from "~/constants/UnitConstants.js";
 import CreateListingUnits from "../../../components/listings/create/CreateListingUnits.vue";
 import CreateListingAvailability from "../../../components/listings/create/CreateListingAvailability.vue";
 import type { PriceAdjustment } from "~/types/ListingTypes.js";
 import CreateListingLocation from "../../../components/listings/create/CreateListingLocation.vue";
 import CreateListingImagePreview from "../../../components/listings/create/CreateListingImagePreview.vue";
 import CreateListingPriceAdjustments from "~/components/listings/create/CreateListingPriceAdjustments.vue";
+import { unitTypes } from "~/constants/UnitConstants.js";
 import type { ListingUnit } from "~/types/ListingTypes.js";
+import type { ListingImage } from "~/types/ListingTypes.js";
 
 definePageMeta({
-  layout: "default",
   middleware: "seller-guard",
 });
-
-type ListingImage = {
-  file: File;
-  previewUrl: string;
-  isUploading: boolean;
-};
 
 const config = useRuntimeConfig();
 const toast = useToast();
@@ -125,6 +119,10 @@ function removeAmenity(index: number) {
 }
 
 async function uploadImage(image: ListingImage) {
+  if (!image.file) {
+    throw new Error("Image file is missing.");
+  }
+
   image.isUploading = true;
 
   try {
@@ -145,7 +143,6 @@ async function uploadImage(image: ListingImage) {
     image.isUploading = false;
   }
 }
-
 async function createListing() {
   isSubmitting.value = true;
 

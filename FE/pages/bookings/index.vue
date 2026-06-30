@@ -1,31 +1,6 @@
 <script setup lang="ts">
 import BookingCard from "~/components/booking/BookingCard.vue";
-
-definePageMeta({
-  layout: "default",
-});
-
-type BookingStatus = "PENDING" | "CONFIRMED" | "CANCELLED";
-
-type UserBooking = {
-  id: number;
-  listingId: number;
-  listingTitle: string;
-  listingLocation: string;
-  listingImage: string | null;
-
-  unitLabel: string;
-
-  checkIn: string;
-  checkOut: string;
-  nights: number;
-
-  pricePerNight: number;
-  totalPrice: number;
-
-  status: BookingStatus;
-  createdAt: string;
-};
+import type { UserBooking } from "~/types/BookingTypes";
 
 const config = useRuntimeConfig();
 const toast = useToast();

@@ -1,16 +1,8 @@
 <script setup lang="ts">
 import type { DateValue } from '@internationalized/date'
 import { today, getLocalTimeZone, parseDate } from '@internationalized/date'
-
-type DateRangeValue = {
-  start: DateValue | undefined
-  end: DateValue | undefined
-}
-
-type BookedRange = {
-  checkIn: string
-  checkOut: string
-}
+import type { DateRangeValue } from '~/types/ComponentTypes';
+import type { BookedRange } from '~/types/BookingTypes';
 
 const dateRange = defineModel<DateRangeValue>({
   required: true

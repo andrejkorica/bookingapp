@@ -1,21 +1,8 @@
 <script setup lang="ts">
-type ListingRequest = {
-  id: number
-  title: string
-  location: string
-  description: string
-  lowestPrice: number
-  highestPrice: number
-  rating: number
-  images: string[]
-  amenities: string[]
-  status: string
-  sellerEmail: string
-  createdAt: string
-}
+import type { Listing } from '~/types/ListingTypes';
 
 const props = defineProps<{
-  listing: ListingRequest
+  listing: Listing
 }>()
 
 const emit = defineEmits<{

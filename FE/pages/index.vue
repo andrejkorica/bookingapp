@@ -3,10 +3,6 @@ import ListingCard from "~/components/listings/ListingCard.vue";
 import FilteringSearchBar from "~/components/filtering/FilteringSearchBar.vue";
 import type { Listing } from "~/types/ListingTypes";
 
-definePageMeta({
-  layout: "default",
-});
-
 const config = useRuntimeConfig();
 
 const listings = ref<Listing[]>([]);

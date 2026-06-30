@@ -1,16 +1,5 @@
 <script setup lang="ts">
-type ReviewVote = "UP" | "DOWN" | null;
-
-type ListingReview = {
-  id: number;
-  userName: string;
-  rating: number;
-  comment: string;
-  createdAt: string;
-  upvotes: number;
-  downvotes: number;
-  currentUserVote: ReviewVote;
-};
+import type { ListingReview } from '~/types/ReviewTypes';
 
 defineProps<{
   review: ListingReview;

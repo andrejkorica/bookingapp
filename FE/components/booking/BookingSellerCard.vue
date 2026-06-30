@@ -1,28 +1,8 @@
 <script setup lang="ts">
-type BookingStatus = "PENDING" | "CONFIRMED" | "CANCELLED";
-
-type SellerBooking = {
-  id: number;
-  listingId: number;
-  listingTitle: string;
-  listingLocation: string;
-  listingImage: string | null;
-
-  unitLabel: string;
-
-  checkIn: string;
-  checkOut: string;
-  nights: number;
-
-  pricePerNight: number;
-  totalPrice: number;
-
-  status: BookingStatus;
-  createdAt: string;
-};
+import type { UserBooking } from '~/types/BookingTypes';
 
 const props = defineProps<{
-  booking: SellerBooking;
+  booking: UserBooking;
 }>();
 
 const emit = defineEmits<{

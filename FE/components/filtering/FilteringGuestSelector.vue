@@ -1,11 +1,8 @@
 <script setup lang="ts">
-type GuestInfo = {
-  adults: number;
-  children: number;
-  rooms: number;
-};
+import type { GuestInfoFilter } from '~/types/ComponentTypes';
 
-const model = defineModel<GuestInfo>({
+
+const model = defineModel<GuestInfoFilter>({
   required: true,
 });
 
@@ -19,11 +16,11 @@ const label = computed(() => {
   return `${adults} adult${adults !== 1 ? "s" : ""} · ${children} children · ${rooms} room${rooms !== 1 ? "s" : ""}`;
 });
 
-function increment(key: keyof GuestInfo) {
+function increment(key: keyof GuestInfoFilter) {
   model.value[key]++;
 }
 
-function decrement(key: keyof GuestInfo) {
+function decrement(key: keyof GuestInfoFilter) {
   if (key === "adults" && model.value.adults <= 1) return;
   if (key === "rooms" && model.value.rooms <= 1) return;
   if (key === "children" && model.value.children <= 0) return;

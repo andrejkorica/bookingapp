@@ -1,38 +1,32 @@
 <script setup lang="ts">
-type UnitType = {
-  label: string
-  value: string
-  quantity: number
-  pricePerNight: number
-  maxGuests?: number
-}
+import type { ListingUnit } from "~/types/ListingTypes";
 
 const selectedUnits = defineModel<Record<string, number>>({
-  required: true
-})
+  required: true,
+});
 
 defineProps<{
-  unitOptions: UnitType[]
-}>()
+  unitOptions: ListingUnit[];
+}>();
 
-function increase(unit: UnitType) {
-  const current = selectedUnits.value[unit.value] ?? 0
+function increase(unit: ListingUnit) {
+  const current = selectedUnits.value[unit.type] ?? 0;
 
   if (current >= unit.quantity) {
-    return
+    return;
   }
 
-  selectedUnits.value[unit.value] = current + 1
+  selectedUnits.value[unit.type] = current + 1;
 }
 
-function decrease(unit: UnitType) {
-  const current = selectedUnits.value[unit.value] ?? 0
+function decrease(unit: ListingUnit) {
+  const current = selectedUnits.value[unit.type] ?? 0;
 
   if (current <= 0) {
-    return
+    return;
   }
 
-  selectedUnits.value[unit.value] = current - 1
+  selectedUnits.value[unit.type] = current - 1;
 }
 </script>
 
@@ -47,10 +41,10 @@ function decrease(unit: UnitType) {
     <div class="grid grid-cols-1 gap-3 md:grid-cols-2">
       <div
         v-for="unit in unitOptions"
-        :key="unit.value"
+        :key="unit.type"
         class="rounded-xl border p-4 transition"
         :class="
-          (selectedUnits[unit.value] ?? 0) > 0
+          (selectedUnits[unit.type] ?? 0) > 0
             ? 'border-indigo-500 bg-indigo-50 ring-2 ring-indigo-200'
             : 'border-slate-200 bg-white'
         "
@@ -86,7 +80,7 @@ function decrease(unit: UnitType) {
           </div>
 
           <UIcon
-            v-if="(selectedUnits[unit.value] ?? 0) > 0"
+            v-if="(selectedUnits[unit.type] ?? 0) > 0"
             name="i-lucide-check-circle"
             class="size-5 shrink-0 text-indigo-600"
           />
@@ -96,7 +90,7 @@ function decrease(unit: UnitType) {
           <p class="text-sm text-slate-600">
             Selected:
             <span class="font-semibold text-slate-900">
-              {{ selectedUnits[unit.value] ?? 0 }}
+              {{ selectedUnits[unit.type] ?? 0 }}
             </span>
           </p>
 
@@ -106,12 +100,12 @@ function decrease(unit: UnitType) {
               color="neutral"
               variant="soft"
               size="sm"
-              :disabled="(selectedUnits[unit.value] ?? 0) <= 0"
+              :disabled="(selectedUnits[unit.type] ?? 0) <= 0"
               @click="decrease(unit)"
             />
 
             <span class="w-6 text-center font-semibold">
-              {{ selectedUnits[unit.value] ?? 0 }}
+              {{ selectedUnits[unit.type] ?? 0 }}
             </span>
 
             <UButton
@@ -119,7 +113,7 @@ function decrease(unit: UnitType) {
               color="primary"
               variant="soft"
               size="sm"
-              :disabled="(selectedUnits[unit.value] ?? 0) >= unit.quantity"
+              :disabled="(selectedUnits[unit.type] ?? 0) >= unit.quantity"
               @click="increase(unit)"
             />
           </div>

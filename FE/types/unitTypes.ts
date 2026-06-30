@@ -4,4 +4,3 @@ export type Unit = {
   maxGuests: number
   roomCount: number
 }
-

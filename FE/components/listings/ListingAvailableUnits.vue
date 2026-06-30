@@ -1,13 +1,5 @@
 <script setup lang="ts">
-type ListingUnit = {
-  id?: number;
-  type: string;
-  label: string;
-  quantity: number;
-  availableQuantity?: number;
-  maxGuests?: number;
-  pricePerNight: number;
-};
+import type { ListingUnit } from '~/types/ListingTypes';
 
 withDefaults(
   defineProps<{
