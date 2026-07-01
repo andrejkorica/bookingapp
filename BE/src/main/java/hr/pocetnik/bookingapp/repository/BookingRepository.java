@@ -57,4 +57,6 @@ public interface BookingRepository extends JpaRepository<BookingEntity, Long> {
                 and b.status = hr.pocetnik.bookingapp.enums.BookingStatus.CONFIRMED
             """)
     Long countActiveBookingsBySeller(@Param("seller") UserEntity seller);
+
+    List<BookingEntity> findByListingSeller(UserEntity seller);
 }

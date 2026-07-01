@@ -35,6 +35,12 @@ async function fetchRequests() {
   }
 }
 
+const sortedRequests = computed(() => {
+  return [...requests.value].sort((a, b) => {
+    return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+  });
+});
+
 async function approveRequest(requestId: number) {
   try {
     const updatedRequest = await $fetch<SellerRequest>(
@@ -134,7 +140,7 @@ onMounted(fetchRequests)
         class="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3"
       >
         <AdminSellerRequestCard
-          v-for="request in requests"
+          v-for="request in sortedRequests"
           :key="request.id"
           :request="request"
           @approve="approveRequest"

@@ -25,4 +25,6 @@ public interface BookingService {
 
     List<BookingRangeResponse> getBookedRanges(Long listingId);
 
+    List<BookingDetailsResponse> getSellerBookings(String sellerEmail);
+
 }

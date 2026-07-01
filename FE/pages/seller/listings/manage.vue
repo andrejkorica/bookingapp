@@ -6,7 +6,6 @@ definePageMeta({
   middleware: "seller-guard",
 });
 
-
 const config = useRuntimeConfig();
 const toast = useToast();
 
@@ -96,7 +95,7 @@ onMounted(fetchListings);
           variant="soft"
           color="neutral"
           class="shrink-0"
-          @click="navigateTo('/seller')"
+          to="/seller"
         />
       </div>
 

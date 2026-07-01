@@ -1,54 +1,84 @@
 <script setup lang="ts">
-import { useAuthStore } from '~/stores/auth'
+import { useAuthStore } from "~/stores/auth";
 
-const authStore = useAuthStore()
-const config = useRuntimeConfig()
-const toast = useToast()
+const authStore = useAuthStore();
+const config = useRuntimeConfig();
+const toast = useToast();
 
-const isSending = ref(false)
+const isSending = ref(false);
 
 const form = reactive({
-  businessName: '',
-  oib: '',
-  iban: '',
-  address: '',
-  requestText: ''
-})
+  businessName: "",
+  oib: "",
+  iban: "",
+  address: "",
+  requestText: "",
+});
 
-const isSeller = computed(() => authStore.user?.role === 'SELLER')
-const isAdmin = computed(() => authStore.user?.role === 'ADMIN')
+const isSeller = computed(() => authStore.user?.role === "SELLER");
+const isAdmin = computed(() => authStore.user?.role === "ADMIN");
 
 async function sendSellerRequest() {
   if (isAdmin.value) {
-    return
+    return;
   }
 
-  isSending.value = true
+  isSending.value = true;
 
   try {
     await $fetch(`${config.public.apiBase}/seller-requests`, {
-      method: 'POST',
-      credentials: 'include',
-      body: form
-    })
+      method: "POST",
+      credentials: "include",
+      body: form,
+    });
 
     toast.add({
-      title: 'Request sent',
-      description: 'Your seller request has been sent for review.',
-      color: 'success'
-    })
+      title: "Request sent",
+      description: "Your seller request has been sent for review.",
+      color: "success",
+    });
   } catch (error) {
-    console.error(error)
+    console.error(error);
 
     toast.add({
-      title: 'Error',
-      description: 'Failed to send seller request.',
-      color: 'error'
-    })
+      title: "Error",
+      description: "Failed to send seller request.",
+      color: "error",
+    });
   } finally {
-    isSending.value = false
+    isSending.value = false;
   }
 }
+
+async function fetchSellerInfo() {
+  if (!isSeller.value) {
+    return;
+  }
+
+  try {
+    const sellerInfo = await $fetch<{
+      businessName: string;
+      oib: string;
+      iban: string;
+      billingAddress: string;
+    }>(`${config.public.apiBase}/seller/me`, {
+      credentials: "include",
+    });
+
+    form.businessName = sellerInfo.businessName ?? "";
+    form.oib = sellerInfo.oib ?? "";
+    form.iban = sellerInfo.iban ?? "";
+    form.address = sellerInfo.billingAddress ?? "";
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+onMounted(async () => {
+  if (isSeller.value) {
+    await fetchSellerInfo();
+  }
+});
 </script>
 
 <template>
@@ -57,14 +87,9 @@ async function sendSellerRequest() {
       <div class="mx-auto max-w-md">
         <UCard>
           <div class="flex flex-col items-center py-8 text-center">
-            <UIcon
-              name="i-lucide-lock"
-              class="mb-4 size-12 text-slate-400"
-            />
+            <UIcon name="i-lucide-lock" class="mb-4 size-12 text-slate-400" />
 
-            <h2 class="text-xl font-semibold">
-              Seller Information Locked
-            </h2>
+            <h2 class="text-xl font-semibold">Seller Information Locked</h2>
 
             <p class="mt-2 text-sm text-slate-600">
               Administrator accounts cannot become sellers or submit seller
@@ -77,34 +102,17 @@ async function sendSellerRequest() {
 
     <template v-else-if="isSeller">
       <div class="text-center">
-        <h2 class="text-xl font-semibold">
-          Seller Info
-        </h2>
+        <h2 class="text-xl font-semibold">Seller Info</h2>
 
         <p class="mt-1 text-sm text-slate-600">
-          You are already registered as a seller.
-        </p>
-      </div>
-    </template>
-
-    <template v-else>
-      <div class="text-center">
-        <h2 class="text-xl font-semibold">
-          Become a Seller
-        </h2>
-
-        <p class="mx-auto mt-1 max-w-md text-sm text-slate-600">
-          Fill in your billing information and send a request to become a
-          seller. An admin needs to approve your request first.
+          Update your seller billing information.
         </p>
       </div>
 
       <div class="mx-auto max-w-lg">
         <UCard>
           <template #header>
-            <h3 class="font-semibold">
-              Seller Request
-            </h3>
+            <h3 class="font-semibold">Update Seller Info</h3>
           </template>
 
           <div class="space-y-4">
@@ -116,17 +124,72 @@ async function sendSellerRequest() {
             </UFormField>
 
             <UFormField label="OIB">
-              <UInput
-                v-model="form.oib"
-                placeholder="Enter your OIB"
-              />
+              <UInput v-model="form.oib" placeholder="Enter your OIB" />
             </UFormField>
 
             <UFormField label="IBAN">
+              <UInput v-model="form.iban" placeholder="Enter your IBAN" />
+            </UFormField>
+
+            <UFormField label="Billing Address">
               <UInput
-                v-model="form.iban"
-                placeholder="Enter your IBAN"
+                v-model="form.address"
+                placeholder="Enter your billing address"
               />
+            </UFormField>
+
+            <UFormField label="Request Message">
+              <UTextarea
+                v-model="form.requestText"
+                placeholder="Tell the admin why you want to update"
+                :rows="4"
+                class="w-full"
+              />
+            </UFormField>
+
+            <div class="pt-2">
+              <UButton
+                label="Send Update Request"
+                :loading="isSending"
+                class="bg-indigo-600 text-white hover:bg-indigo-700"
+                @click="sendSellerRequest"
+              />
+            </div>
+          </div>
+        </UCard>
+      </div>
+    </template>
+
+    <template v-else>
+      <div class="text-center">
+        <h2 class="text-xl font-semibold">Become a Seller</h2>
+
+        <p class="mx-auto mt-1 max-w-md text-sm text-slate-600">
+          Fill in your billing information and send a request to become a
+          seller. An admin needs to approve your request first.
+        </p>
+      </div>
+
+      <div class="mx-auto max-w-lg">
+        <UCard>
+          <template #header>
+            <h3 class="font-semibold">Seller Request</h3>
+          </template>
+
+          <div class="space-y-4">
+            <UFormField label="Business Name">
+              <UInput
+                v-model="form.businessName"
+                placeholder="Enter your business name"
+              />
+            </UFormField>
+
+            <UFormField label="OIB">
+              <UInput v-model="form.oib" placeholder="Enter your OIB" />
+            </UFormField>
+
+            <UFormField label="IBAN">
+              <UInput v-model="form.iban" placeholder="Enter your IBAN" />
             </UFormField>
 
             <UFormField label="Billing Address">

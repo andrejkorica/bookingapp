@@ -1,14 +1,28 @@
 <script setup lang="ts">
-import type { SellerRequest } from '~/types/SellerTypes';
+import type { SellerRequest } from "~/types/SellerTypes";
 
-defineProps<{
-  request: SellerRequest
-}>()
+const props = defineProps<{
+  request: SellerRequest;
+}>();
 
 const emit = defineEmits<{
-  approve: [id: number]
-  reject: [id: number]
-}>()
+  approve: [id: number];
+  reject: [id: number];
+}>();
+
+const canReview = computed(() => {
+  return (
+    props.request.status === "PENDING" || props.request.status === "UPDATE"
+  );
+});
+
+const statusColor = computed(() => {
+  if (props.request.status === "APPROVED") return "success";
+  if (props.request.status === "REJECTED") return "error";
+  if (props.request.status === "UPDATE") return "info";
+
+  return "warning";
+});
 </script>
 
 <template>
@@ -25,17 +39,7 @@ const emit = defineEmits<{
           </p>
         </div>
 
-        <UBadge
-          :label="request.status"
-          :color="
-            request.status === 'APPROVED'
-              ? 'success'
-              : request.status === 'REJECTED'
-                ? 'error'
-                : 'warning'
-          "
-          variant="soft"
-        />
+        <UBadge :label="request.status" :color="statusColor" variant="soft" />
       </div>
     </template>
 
@@ -65,18 +69,14 @@ const emit = defineEmits<{
       </div>
 
       <div>
-        <p class="font-medium text-slate-800">
-          Message:
-        </p>
+        <p class="font-medium text-slate-800">Message:</p>
 
         <p class="mt-1 whitespace-pre-line">
           {{ request.requestText }}
         </p>
       </div>
 
-      <p class="text-xs text-slate-400">
-        Created: {{ request.createdAt }}
-      </p>
+      <p class="text-xs text-slate-400">Created: {{ request.createdAt }}</p>
     </div>
 
     <template #footer>
@@ -84,20 +84,20 @@ const emit = defineEmits<{
         <UButton
           label="Approve"
           icon="i-lucide-check"
-          :color="request.status === 'PENDING' ? 'success' : 'neutral'"
+          :color="canReview ? 'success' : 'neutral'"
           variant="soft"
-          :disabled="request.status !== 'PENDING'"
-          :class="request.status !== 'PENDING' ? 'opacity-50' : ''"
+          :disabled="!canReview"
+          :class="!canReview ? 'opacity-50' : ''"
           @click="emit('approve', request.id)"
         />
 
         <UButton
           label="Reject"
           icon="i-lucide-x"
-          :color="request.status === 'PENDING' ? 'error' : 'neutral'"
+          :color="canReview ? 'error' : 'neutral'"
           variant="soft"
-          :disabled="request.status !== 'PENDING'"
-          :class="request.status !== 'PENDING' ? 'opacity-50' : ''"
+          :disabled="!canReview"
+          :class="!canReview ? 'opacity-50' : ''"
           @click="emit('reject', request.id)"
         />
       </div>

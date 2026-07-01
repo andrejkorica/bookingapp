@@ -41,29 +41,29 @@ public class SellerRequestServiceImpl implements SellerRequestService {
             String iban,
             String billingAddress,
             String requestText) {
+
         UserEntity user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UserNotFoundException(email));
 
-        if (sellerRequestRepository.existsByUserAndStatus(user, SellerRequestStatus.PENDING)) {
+        if (sellerRequestRepository.existsByUserAndStatus(user, SellerRequestStatus.PENDING)
+                || sellerRequestRepository.existsByUserAndStatus(user, SellerRequestStatus.UPDATE)) {
             throw new RuntimeException("You already have a pending seller request.");
         }
 
-        SellerDataEntity sellerData = sellerDataRepository
-                .findByUser(user)
-                .orElse(new SellerDataEntity());
-
-        sellerData.setBusinessName(businessName);
-        sellerData.setOib(oib);
-        sellerData.setIban(iban);
-        sellerData.setBillingAddress(billingAddress);
-        sellerData.setUser(user);
-
-        sellerDataRepository.save(sellerData);
-
         SellerRequestEntity request = new SellerRequestEntity();
+
         request.setUser(user);
+        request.setBusinessName(businessName);
+        request.setOib(oib);
+        request.setIban(iban);
+        request.setBillingAddress(billingAddress);
         request.setRequestText(requestText);
-        request.setStatus(SellerRequestStatus.PENDING);
+
+        if (user.getSellerData() != null) {
+            request.setStatus(SellerRequestStatus.UPDATE);
+        } else {
+            request.setStatus(SellerRequestStatus.PENDING);
+        }
 
         return sellerRequestRepository.save(request);
     }
@@ -78,8 +78,27 @@ public class SellerRequestServiceImpl implements SellerRequestService {
         SellerRequestEntity request = sellerRequestRepository.findById(requestId)
                 .orElseThrow(() -> new RuntimeException("Seller request not found."));
 
+        UserEntity user = request.getUser();
+
+        SellerDataEntity sellerData = user.getSellerData();
+
+        if (sellerData == null) {
+            sellerData = new SellerDataEntity();
+            sellerData.setUser(user);
+            user.setSellerData(sellerData);
+        }
+
+        sellerData.setBusinessName(request.getBusinessName());
+        sellerData.setOib(request.getOib());
+        sellerData.setIban(request.getIban());
+        sellerData.setBillingAddress(request.getBillingAddress());
+
+        sellerDataRepository.save(sellerData);
+
+        user.setRole(Role.SELLER);
+        userRepository.save(user);
+
         request.setStatus(SellerRequestStatus.APPROVED);
-        request.getUser().setRole(Role.SELLER);
 
         return sellerRequestRepository.save(request);
     }

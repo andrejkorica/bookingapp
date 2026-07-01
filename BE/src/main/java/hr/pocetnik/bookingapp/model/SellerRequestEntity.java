@@ -17,6 +17,14 @@ public class SellerRequestEntity {
     @Column(name = "seller_request_id")
     private Long id;
 
+    private String businessName;
+
+    private String oib;
+
+    private String iban;
+
+    private String billingAddress;
+
     @Column(length = 1000)
     private String requestText;
 

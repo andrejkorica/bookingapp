@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useAuthStore } from "~/stores/auth";
-import defaultAvatar from "../../assets/images/default-avatar.png";
+import defaultAvatar from "~/public/images/default-avatar.png";
 
 const config = useRuntimeConfig();
 const toast = useToast();

@@ -12,6 +12,7 @@ import hr.pocetnik.bookingapp.service.BookingService;
 import hr.pocetnik.bookingapp.service.JwtService;
 import io.jsonwebtoken.Claims;
 import org.springframework.stereotype.Service;
+
 import hr.pocetnik.bookingapp.dto.booking.BookingDetailsResponse;
 import hr.pocetnik.bookingapp.dto.booking.BookingRangeResponse;
 import hr.pocetnik.bookingapp.dto.booking.BookingUnitResponse;
@@ -420,6 +421,20 @@ public class BookingServiceImpl implements BookingService {
         }
 
         return booking;
+    }
+
+    @Override
+    public List<BookingDetailsResponse> getSellerBookings(String token) {
+        Claims claims = jwtService.extractAllClaims(token);
+        String email = claims.getSubject();
+
+        UserEntity seller = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Seller not found"));
+
+        return bookingRepository.findByListingSeller(seller)
+                .stream()
+                .map(this::mapToDetailsResponse)
+                .toList();
     }
 
     @Override

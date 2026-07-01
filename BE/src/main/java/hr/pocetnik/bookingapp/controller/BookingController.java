@@ -6,6 +6,7 @@ import hr.pocetnik.bookingapp.dto.booking.BookingRequest;
 import hr.pocetnik.bookingapp.dto.booking.BookingResponse;
 import hr.pocetnik.bookingapp.exception.TokenNotFoundException;
 import hr.pocetnik.bookingapp.service.BookingService;
+import jakarta.servlet.http.HttpServletRequest;
 
 import java.util.List;
 
@@ -90,11 +91,22 @@ public class BookingController {
 
         return bookingService.rejectBooking(token, bookingId);
     }
-    
-        @GetMapping("/{listingId}/booked-ranges")
+
+    @GetMapping("/{listingId}/booked-ranges")
     public ResponseEntity<List<BookingRangeResponse>> getBookedRanges(
             @PathVariable Long listingId) {
         return ResponseEntity.ok(bookingService.getBookedRanges(listingId));
+    }
+
+    @GetMapping("/seller/bookings")
+    public List<BookingDetailsResponse> getSellerBookings(
+            @CookieValue("token") String token) {
+
+        if (token == null || token.isEmpty()) {
+            throw new TokenNotFoundException();
+        }
+
+        return bookingService.getSellerBookings(token);
     }
 
 }

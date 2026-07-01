@@ -113,7 +113,8 @@ onMounted(fetchDashboardStats);
         </UCard>
       </div>
 
-      <div class="grid items-stretch gap-6 md:grid-cols-2">
+
+      <div class="grid items-stretch gap-6 md:grid-cols-3">
         <UCard :ui="actionCardUi">
           <template #header>
             <h2 class="font-semibold">Create Listing</h2>
@@ -151,6 +152,26 @@ onMounted(fetchDashboardStats);
               variant="soft"
               color="neutral"
               to="/seller/listings/manage"
+            />
+          </template>
+        </UCard>
+
+        <UCard :ui="actionCardUi">
+          <template #header>
+            <h2 class="font-semibold">Manage Bookings</h2>
+          </template>
+
+          <p class="text-sm text-slate-600">
+            View all active and pending bookings, confirm new reservations, cancel bookings if necessary, and review guest information.
+          </p>
+
+          <template #footer>
+            <UButton
+              label="Manage Bookings"
+              icon="i-lucide-calendar-check"
+              variant="soft"
+              color="neutral"
+              to="/seller/manage-bookings"
             />
           </template>
         </UCard>

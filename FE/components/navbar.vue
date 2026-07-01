@@ -3,7 +3,7 @@ import { ref, computed } from "vue";
 import { useAuthStore } from "~/stores/auth";
 import type { DropdownMenuItem } from "@nuxt/ui";
 import OptionsModal from "./OptionsModal.vue";
-import defaultAvatar from "~/assets/images/default-avatar.png";
+import defaultAvatar from "~/public/images/default-avatar.png";
 
 const authStore = useAuthStore();
 
@@ -16,13 +16,17 @@ const openModal = (tab: "profile" | "seller") => {
   optionsModalOpen.value = true;
 };
 
+const avatarSrc = computed(() => {
+  return authStore.user?.profileImageUrl || "/images/default-avatar.png";
+});
+
 const dropdownItems = computed<DropdownMenuItem[][]>(() => [
   [
     {
       label: authStore.user?.name || "User",
       type: "label",
       avatar: {
-        src: authStore.user?.profileImageUrl || defaultAvatar,
+        src: avatarSrc.value,
       },
     },
   ],
