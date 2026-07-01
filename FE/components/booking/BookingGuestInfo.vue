@@ -45,7 +45,11 @@ const canContinue = computed(() => {
     guestInfo.value.name &&
     guestInfo.value.surname &&
     guestInfo.value.email &&
-    guestInfo.value.phoneNumber,
+    guestInfo.value.phoneNumber &&
+    guestInfo.value.travelingFrom &&
+    guestInfo.value.travelPurpose &&
+    guestInfo.value.arrivalTime &&
+    guestInfo.value.arrivalMethod
   );
 });
 
@@ -102,14 +106,14 @@ onMounted(fetchCurrentUser);
       </template>
 
       <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-        <UFormField label="Traveling from">
+        <UFormField label="Traveling from" required>
           <UInput
             v-model="guestInfo.travelingFrom"
             placeholder="City or country"
             class="w-full"
           />
         </UFormField>
-        <UFormField label="Purpose of travel">
+        <UFormField label="Purpose of travel" required>
           <USelect
             v-model="guestInfo.travelPurpose"
             :items="travelPurposeOptions"
@@ -118,11 +122,11 @@ onMounted(fetchCurrentUser);
           />
         </UFormField>
 
-        <UFormField label="Estimated arrival time">
+        <UFormField label="Estimated arrival time" required>
           <UInput v-model="guestInfo.arrivalTime" type="time" class="w-full" />
         </UFormField>
 
-        <UFormField label="How are you arriving?">
+        <UFormField label="How are you arriving?" required>
           <USelect
             v-model="guestInfo.arrivalMethod"
             :items="arrivalMethodOptions"

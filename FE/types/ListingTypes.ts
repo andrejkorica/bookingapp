@@ -39,6 +39,18 @@ export type ListingReviews = {
   reviewCount: number;
 };
 
+export type FavoriteListing = ListingLocation &
+  ListingPrice & {
+    id: number;
+
+    title: string;
+    description: string;
+
+    rating: number;
+
+    images: string[];
+  };
+
 export type Listing = ListingLocation &
   ListingPrice &
   ListingReviews & {

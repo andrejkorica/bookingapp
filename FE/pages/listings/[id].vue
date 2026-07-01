@@ -4,6 +4,7 @@ import CreateListingImagePreview from "~/components/listings/create/CreateListin
 import ListingLocationMap from "~/components/listings/ListingLocationMap.vue";
 import ListingAvailableUnits from "~/components/listings/ListingAvailableUnits.vue";
 import ListingsReviews from "~/components/listings/reviews/ListingsReviews.vue";
+import ListingBookingSidebar from "~/components/listings/ListingBookingSidebar.vue";
 import type { ListingReview } from "~/types/ReviewTypes";
 import type { Listing, ListingUnit } from "~/types/ListingTypes";
 
@@ -20,6 +21,9 @@ const reviews = ref<ListingReview[]>([]);
 const isLoading = ref(false);
 const isLoadingAvailableUnits = ref(false);
 const isSubmittingReview = ref(false);
+
+const isFavorited = ref(false);
+const isTogglingFavorite = ref(false);
 
 const previewImages = computed(() => {
   return (
@@ -39,6 +43,72 @@ const hasAvailableUnits = computed(() => {
     return quantity > 0;
   });
 });
+
+async function fetchFavoriteStatus(listingId: number) {
+  if (!authStore.user) {
+    isFavorited.value = false;
+    return;
+  }
+
+  try {
+    const response = await $fetch<{ favorited: boolean }>(
+      `${config.public.apiBase}/favorites/${listingId}`,
+      {
+        credentials: "include",
+      },
+    );
+
+    isFavorited.value = response.favorited;
+  } catch (error) {
+    console.error(error);
+    isFavorited.value = false;
+  }
+}
+
+async function toggleFavorite() {
+  if (!listingData.value) return;
+
+  if (!authStore.user) {
+    toast.add({
+      title: "Login required",
+      description: "You need to log in to favorite listings.",
+      color: "warning",
+    });
+
+    return;
+  }
+
+  isTogglingFavorite.value = true;
+
+  try {
+    const response = await $fetch<{ favorited: boolean }>(
+      `${config.public.apiBase}/favorites/${listingData.value.id}/toggle`,
+      {
+        method: "POST",
+        credentials: "include",
+      },
+    );
+
+    isFavorited.value = response.favorited;
+
+    toast.add({
+      title: response.favorited
+        ? "Added to favorites"
+        : "Removed from favorites",
+      color: "success",
+    });
+  } catch (error) {
+    console.error(error);
+
+    toast.add({
+      title: "Favorite failed",
+      description: "Could not update favorite status.",
+      color: "error",
+    });
+  } finally {
+    isTogglingFavorite.value = false;
+  }
+}
 
 const isAvailableForBooking = computed(() => {
   if (!listingData.value?.availableFrom) return true;
@@ -72,6 +142,43 @@ const isOwner = computed(() => {
   return authStore.user.email === listingData.value.sellerEmail;
 });
 
+const canBook = computed(() => {
+  return Boolean(
+    authStore.user &&
+    !isOwner.value &&
+    isAvailableForBooking.value &&
+    hasAvailableUnits.value,
+  );
+});
+
+const bookTo = computed(() => {
+  if (!listingData.value || !canBook.value) {
+    return undefined;
+  }
+
+  return `/bookings/create?listingId=${listingData.value.id}`;
+});
+
+const disabledMessage = computed(() => {
+  if (!authStore.user) {
+    return "You need to log in before booking this listing.";
+  }
+
+  if (isOwner.value) {
+    return "You cannot book your own listing.";
+  }
+
+  if (!hasAvailableUnits.value) {
+    return "No units are currently available for booking.";
+  }
+
+  if (!isAvailableForBooking.value) {
+    return "This listing is not available yet.";
+  }
+
+  return "";
+});
+
 async function fetchReviews(listingId: number) {
   try {
     reviews.value = await $fetch<ListingReview[]>(
@@ -103,6 +210,8 @@ async function fetchListing() {
   isLoading.value = true;
 
   try {
+    await authStore.fetchUser();
+
     listingData.value = await $fetch<Listing>(
       `${config.public.apiBase}/listings/${route.params.id}`,
     );
@@ -110,6 +219,7 @@ async function fetchListing() {
     await Promise.all([
       fetchAvailableUnits(listingData.value.id),
       fetchReviews(listingData.value.id),
+      fetchFavoriteStatus(listingData.value.id),
     ]);
   } catch (error) {
     console.error(error);
@@ -300,58 +410,15 @@ useHead(() => ({
           </div>
 
           <div>
-            <UCard class="border border-slate-200 bg-white shadow-lg">
-              <div class="space-y-4 text-center">
-                <p class="text-lg text-slate-500">Price per night</p>
-
-                <p class="text-4xl font-bold">
-                  {{ priceLabel }}
-                </p>
-
-                <UButton
-                  label="Book now"
-                  size="xl"
-                  block
-                  class="bg-indigo-600 font-bold text-white hover:bg-indigo-700"
-                  :disabled="
-                    !authStore.user ||
-                    isOwner ||
-                    !isAvailableForBooking ||
-                    !hasAvailableUnits
-                  "
-                  :to="
-                    authStore.user &&
-                    !isOwner &&
-                    isAvailableForBooking &&
-                    hasAvailableUnits
-                      ? `/bookings/create?listingId=${listingData.id}`
-                      : undefined
-                  "
-                />
-
-                <p v-if="!authStore.user" class="text-sm text-slate-500">
-                  You need to log in before booking this listing.
-                </p>
-
-                <p v-else-if="isOwner" class="text-sm text-slate-500">
-                  You cannot book your own listing.
-                </p>
-
-                <p
-                  v-else-if="!hasAvailableUnits"
-                  class="text-sm text-slate-500"
-                >
-                  No units are currently available for booking.
-                </p>
-
-                <p
-                  v-else-if="!isAvailableForBooking"
-                  class="text-sm text-slate-500"
-                >
-                  This listing is not available yet.
-                </p>
-              </div>
-            </UCard>
+            <ListingBookingSidebar
+              :price-label="priceLabel"
+              :can-book="canBook"
+              :book-to="bookTo"
+              :disabled-message="disabledMessage"
+              :is-favorited="isFavorited"
+              :is-toggling-favorite="isTogglingFavorite"
+              @toggle-favorite="toggleFavorite"
+            />
           </div>
         </div>
 

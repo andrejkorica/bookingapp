@@ -7,6 +7,7 @@ import hr.pocetnik.bookingapp.dto.listing.ListingAvailableUnitResponse;
 import hr.pocetnik.bookingapp.dto.listing.ListingRequest;
 import hr.pocetnik.bookingapp.dto.listing.ListingResponse;
 import hr.pocetnik.bookingapp.dto.seller.SellerStatisticsResponse;
+import hr.pocetnik.bookingapp.model.ListingEntity;
 
 public interface ListingService {
 
@@ -52,5 +53,7 @@ public interface ListingService {
         List<String> getAmenities();
 
         SellerStatisticsResponse getSellerDashboardStats(String sellerEmail);
+
+        ListingResponse mapListingToResponse(ListingEntity listing);
 
 }

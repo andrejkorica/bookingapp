@@ -1,77 +1,84 @@
-
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import { useAuthStore } from '~/stores/auth'
-import type { DropdownMenuItem } from '@nuxt/ui'
-import OptionsModal from './OptionsModal.vue'
+import { ref, computed } from "vue";
+import { useAuthStore } from "~/stores/auth";
+import type { DropdownMenuItem } from "@nuxt/ui";
+import OptionsModal from "./OptionsModal.vue";
+import defaultAvatar from "~/assets/images/default-avatar.png";
 
-const authStore = useAuthStore()
+const authStore = useAuthStore();
 
-const optionsModalOpen = ref(false)
+const optionsModalOpen = ref(false);
 
-const activeTab = ref<'profile' | 'seller' | 'bookings'>('profile')
+const activeTab = ref<"profile" | "seller">("profile");
 
-const openModal = (tab: 'profile' | 'seller' | 'bookings') => {
-  activeTab.value = tab
-  optionsModalOpen.value = true
-}
+const openModal = (tab: "profile" | "seller") => {
+  activeTab.value = tab;
+  optionsModalOpen.value = true;
+};
 
 const dropdownItems = computed<DropdownMenuItem[][]>(() => [
   [
     {
-      label: authStore.user?.name || 'User',
-      type: 'label',
-      avatar: { src: 'https://i.pravatar.cc/100' }
-    }
+      label: authStore.user?.name || "User",
+      type: "label",
+      avatar: {
+        src: authStore.user?.profileImageUrl || defaultAvatar,
+      },
+    },
   ],
   [
     {
-      label: 'Profile',
-      icon: 'i-lucide-user',
-      onSelect: () => openModal('profile')
+      label: "Profile",
+      icon: "i-lucide-user",
+      onSelect: () => openModal("profile"),
     },
     {
-      label: 'Seller info',
-      icon: 'i-lucide-badge-dollar-sign',
-      onSelect: () => openModal('seller')
+      label: "Seller info",
+      icon: "i-lucide-badge-dollar-sign",
+      onSelect: () => openModal("seller"),
     },
 
-    ...(authStore.user?.role === 'ADMIN'
+    ...(authStore.user?.role === "ADMIN"
       ? [
           {
-            label: 'Admin Dashboard',
-            icon: 'i-lucide-shield-check',
-            onSelect: () => navigateTo('/admin')
-          }
+            label: "Admin Dashboard",
+            icon: "i-lucide-shield-check",
+            onSelect: () => navigateTo("/admin"),
+          },
         ]
-      : authStore.user?.role === 'SELLER'
+      : authStore.user?.role === "SELLER"
         ? [
             {
-              label: 'Seller Dashboard',
-              icon: 'i-lucide-layout-dashboard',
-              onSelect: () => navigateTo('/seller')
-            }
+              label: "Seller Dashboard",
+              icon: "i-lucide-layout-dashboard",
+              onSelect: () => navigateTo("/seller"),
+            },
           ]
         : []),
 
     {
-      label: 'Booking History',
-      icon: 'i-lucide-calendar',
-      onSelect: () => navigateTo('/bookings')
-    }
+      label: "Booking History",
+      icon: "i-lucide-calendar",
+      onSelect: () => navigateTo("/bookings"),
+    },
+    {
+      label: "Favorites",
+      icon: "i-heroicons-heart",
+      onSelect: () => navigateTo("/favorites"),
+    },
   ],
   [
     {
-      label: 'Log out',
-      icon: 'i-lucide-log-out',
-      color: 'error',
+      label: "Log out",
+      icon: "i-lucide-log-out",
+      color: "error",
       onSelect: async () => {
-        await authStore.logout()
-        await navigateTo('/')
-      }
-    }
-  ]
-])
+        await authStore.logout();
+        await navigateTo("/");
+      },
+    },
+  ],
+]);
 </script>
 
 <template>
@@ -89,48 +96,44 @@ const dropdownItems = computed<DropdownMenuItem[][]>(() => [
       </div>
 
       <ClientOnly>
-      <div v-if="!authStore.user" class="flex items-center space-x-3">
-        <UButton
-          label="Sign up"
-          variant="soft"
-          color="neutral"
-          size="sm"
-          to="/auth/signup"
-        />
-        <UButton
-          label="Sign in"
-          variant="solid"
-          size="sm"
-          class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold"
-          to="/auth/signin"
-        />
-      </div>
-
-      <div v-else class="flex items-center space-x-4">
-        <span class="text-sm text-slate-600">
-          Hi, {{ authStore.user.name }}
-        </span>
-
-        <UDropdownMenu
-          :items="dropdownItems"
-          :content="{ align: 'end', side: 'bottom', sideOffset: 6 }"
-          :ui="{ content: 'w-56' }"
-        >
+        <div v-if="!authStore.user" class="flex items-center space-x-3">
           <UButton
-            icon="i-lucide-user"
-            variant="ghost"
+            label="Sign up"
+            variant="soft"
+            color="neutral"
             size="sm"
-            class="text-slate-500 hover:text-slate-700 hover:bg-slate-100"
+            to="/auth/signup"
           />
-        </UDropdownMenu>
-      </div>
+          <UButton
+            label="Sign in"
+            variant="solid"
+            size="sm"
+            class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold"
+            to="/auth/signin"
+          />
+        </div>
+
+        <div v-else class="flex items-center space-x-4">
+          <span class="text-sm text-slate-600">
+            Hi, {{ authStore.user.name }}
+          </span>
+
+          <UDropdownMenu
+            :items="dropdownItems"
+            :content="{ align: 'end', side: 'bottom', sideOffset: 6 }"
+            :ui="{ content: 'w-56' }"
+          >
+            <UButton
+              icon="i-lucide-user"
+              variant="ghost"
+              size="sm"
+              class="text-slate-500 hover:text-slate-700 hover:bg-slate-100"
+            />
+          </UDropdownMenu>
+        </div>
       </ClientOnly>
     </nav>
-    
 
-    <OptionsModal
-      v-model:open="optionsModalOpen"
-      v-model:tab="activeTab"
-    />
+    <OptionsModal v-model:open="optionsModalOpen" v-model:tab="activeTab" />
   </header>
 </template>

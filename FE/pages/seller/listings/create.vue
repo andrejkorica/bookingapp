@@ -118,6 +118,7 @@ function removeAmenity(index: number) {
   form.amenities.splice(index, 1);
 }
 
+
 async function uploadImage(image: ListingImage) {
   if (!image.file) {
     throw new Error("Image file is missing.");
@@ -143,6 +144,8 @@ async function uploadImage(image: ListingImage) {
     image.isUploading = false;
   }
 }
+
+
 async function createListing() {
   isSubmitting.value = true;
 
@@ -207,7 +210,23 @@ async function createListing() {
   } finally {
     isSubmitting.value = false;
   }
+
 }
+
+const canContinue = computed(() => {
+  return (
+    form.title.trim() !== "" &&
+    form.location.trim() !== "" &&
+    form.description.trim() !== "" &&
+
+    images.value.length > 0 &&
+
+    form.amenities.length > 0 &&
+    form.amenities.every((amenity) => amenity.trim() !== "") &&
+
+    selectedUnits.value.length > 0
+  );
+});
 
 onUnmounted(() => {
   images.value.forEach((image) => URL.revokeObjectURL(image.previewUrl));
@@ -392,9 +411,7 @@ onUnmounted(() => {
                   €{{ lowestPrice }} - €{{ highestPrice }}
                 </p>
 
-                <p v-else class="text-sm text-slate-500">
-                  Add at least one unit with quantity and price.
-                </p>
+                
               </div>
 
               <UButton
@@ -404,9 +421,13 @@ onUnmounted(() => {
                 block
                 class="bg-indigo-600 font-bold text-white hover:bg-indigo-700"
                 :loading="isSubmitting"
-                :disabled="isSubmitting || selectedUnits.length === 0"
+                :disabled="isSubmitting || !canContinue"
                 @click="createListing"
               />
+
+              <p class="text-sm text-slate-500">
+                  Fill in all required fields, upload at least one image, and add at least one unit with a price to create your listing.
+              </p>
             </div>
           </UCard>
         </div>

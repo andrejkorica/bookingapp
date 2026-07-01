@@ -81,7 +81,7 @@ public class ListingServiceImpl implements ListingService {
 
         ListingEntity savedListing = listingRepository.save(listing);
 
-        return mapToResponse(savedListing);
+        return mapListingToResponse(savedListing);
     }
 
     @Override
@@ -93,7 +93,7 @@ public class ListingServiceImpl implements ListingService {
 
         return listingRepository.findBySeller(seller)
                 .stream()
-                .map(this::mapToResponse)
+                .map(this::mapListingToResponse)
                 .toList();
     }
 
@@ -101,7 +101,7 @@ public class ListingServiceImpl implements ListingService {
     public List<ListingResponse> getAllApprovedListings() {
         return listingRepository.findByStatus(ListingStatus.APPROVED)
                 .stream()
-                .map(this::mapToResponse)
+                .map(this::mapListingToResponse)
                 .toList();
     }
 
@@ -112,14 +112,14 @@ public class ListingServiceImpl implements ListingService {
         ListingEntity listing = listingRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Listing not found"));
 
-        return mapToResponse(listing);
+        return mapListingToResponse(listing);
     }
 
     @Override
     public List<ListingResponse> getAllListings() {
         return listingRepository.findAllByOrderByCreatedAtDesc()
                 .stream()
-                .map(this::mapToResponse)
+                .map(this::mapListingToResponse)
                 .toList();
     }
 
@@ -130,7 +130,7 @@ public class ListingServiceImpl implements ListingService {
 
         listing.setStatus(ListingStatus.APPROVED);
 
-        return mapToResponse(listingRepository.save(listing));
+        return mapListingToResponse(listingRepository.save(listing));
     }
 
     @Override
@@ -140,7 +140,7 @@ public class ListingServiceImpl implements ListingService {
 
         listing.setStatus(ListingStatus.REJECTED);
 
-        return mapToResponse(listingRepository.save(listing));
+        return mapListingToResponse(listingRepository.save(listing));
     }
 
     @Override
@@ -156,7 +156,7 @@ public class ListingServiceImpl implements ListingService {
 
         ListingEntity savedListing = listingRepository.save(listing);
 
-        return mapToResponse(savedListing);
+        return mapListingToResponse(savedListing);
     }
 
     @Override
@@ -200,7 +200,7 @@ public class ListingServiceImpl implements ListingService {
 
         ListingEntity savedListing = listingRepository.save(listing);
 
-        return mapToResponse(savedListing);
+        return mapListingToResponse(savedListing);
     }
 
     private List<ListingUnitEntity> mapUnits(
@@ -340,7 +340,7 @@ public class ListingServiceImpl implements ListingService {
         }
 
         return stream
-                .map(this::mapToResponse)
+                .map(this::mapListingToResponse)
                 .toList();
     }
 
@@ -466,8 +466,10 @@ public class ListingServiceImpl implements ListingService {
                 activeBookings);
     }
 
-    private ListingResponse mapToResponse(
-            ListingEntity listing) {
+
+
+    @Override
+    public ListingResponse mapListingToResponse(ListingEntity listing) {
 
         ListingResponse response = new ListingResponse();
         Long reviewCount = reviewRepository.countByListingId(listing.getId());
